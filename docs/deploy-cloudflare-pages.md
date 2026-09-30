@@ -117,6 +117,14 @@ Cloudflare Pages 有内置约定：只要输出目录存在 `404.html`，未命�
 
 每个入口页都有独立的 `title` / `description` / `canonical` / OG / Twitter 标签。
 
+> **关于链接路径**：入口页之间使用**相对路径**（如 `href="ai.html"`）互相引用。
+> 这与三份平台配置（Cloudflare / Vercel `cleanUrls+trailingSlash:false` / Netlify）一致，
+> 且额外兼容「部署到子路径」的场景。Cloudflare Pages 会自动把 `/ai/` 归一化为 `/ai`，
+> 因此不会产生相对路径错位。
+>
+> **例外**：若你把站点部署在**子目录**（如 `example.com/blog/`），相对路径依然可用，但需相应调整
+> `SITE_URL` 为 `https://example.com/blog`，否则 canonical / sitemap 的绝对地址会不正确。
+
 ---
 
 ## 验证清单
