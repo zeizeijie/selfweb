@@ -124,6 +124,17 @@ node tools/build.js
 
 完整步骤与验证清单见 **[docs/deploy-cloudflare-pages.md](docs/deploy-cloudflare-pages.md)**。
 
+##### 自动定时构建（同步 Notion）
+
+Pages 默认只在 `git push` 时构建，Notion 改内容不会触发。做法是创建 **Deploy Hook**，再用定时器调用它：
+
+| 方案 | 位置 | 说明 |
+| --- | --- | --- |
+| A. Workers Cron Trigger（推荐） | `cloudflare/rebuild-worker/` | 已内置代码，`npx wrangler deploy` + `wrangler secret put DEPLOY_HOOK_URL` |
+| B. GitHub Actions | `.github/workflows/rebuild.yml` | 已内置，定时**默认关闭**，取消注释即启用 |
+
+两者二选一，不要同时启用。Cron 按 **UTC** 执行（北京时间 = UTC+8），建议每天 1 次（≈30 次/月，免费额度 500 次）。详见文档「自动定时构建」章节。
+
 #### 其他平台
 
 已内置 `vercel.json` 与 `netlify.toml`：

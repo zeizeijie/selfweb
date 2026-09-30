@@ -1,0 +1,47 @@
+# ============================================================
+# 定时触发 Cloudflare Pages 重建，用于同步 Notion 最新内容
+# ------------------------------------------------------------
+# ⚠️ 与 Worker 方案二选一，不要同时启用（会重复构建、浪费额度）。
+#    本文件默认【不启用定时】，仅保留手动触发（workflow_dispatch）。
+#    若要改用此方案，按下面两步操作即可。
+#
+# 启用步骤：
+#   1. 取消下面 schedule 段的注释
+#   2. 在 GitHub 仓库 Settings → Secrets and variables → Actions
+#      添加 repository secret：DEPLOY_HOOK_URL = 你的 Deploy Hook URL
+#
+# 说明：GitHub Actions 的 schedule 按 UTC 执行（北京时间 = UTC+8），
+#       且高峰时段可能延迟数分钟，不保证准点。
+# 完整文档见 docs/deploy-cloudflare-pages.md
+# ============================================================
+
+name: Rebuild site (Notion sync)
+
+on:
+  # ---- 定时触发（默认关闭，取消注释即启用）----
+  # schedule:
+  #   # 每天 UTC 01:00 = 北京时间 09:00（约 30 次/月，免费额度充足）
+  #   - cron: "0 1 * * *"
+
+  # ---- 手动触发（在 Actions 页面点击 Run workflow）----
+  workflow_dispatch:
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Cloudflare Pages Deploy Hook
+        run: |
+          if [ -z "$DEPLOY_HOOK_URL" ]; then
+            echo "::error::未配置 secret DEPLOY_HOOK_URL，无法触发构建"
+            exit 1
+          fi
+          code=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$DEPLOY_HOOK_URL")
+          echo "Deploy Hook 响应码: $code"
+          if [ "$code" != "200" ]; then
+            echo "::error::触发失败，响应码 $code"
+            exit 1
+          fi
+          echo "构建已触发，请在 Cloudflare Pages → Deployments 查看进度"
+        env:
+          DEPLOY_HOOK_URL: ${{ secrets.DEPLOY_HOOK_URL }}

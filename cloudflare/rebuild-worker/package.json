@@ -1,0 +1,12 @@
+{
+  "name": "zeizeijie-rebuild-worker",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "定时触发 Cloudflare Pages 重建，用于同步 Notion 最新内容",
+  "scripts": {
+    "test": "node test.js",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail"
+  }
+}

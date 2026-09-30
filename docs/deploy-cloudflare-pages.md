@@ -81,6 +81,182 @@ npx wrangler pages deploy site/dist --project-name=zeizeijie
 
 ---
 
+## 自动定时构建（同步 Notion 更新）
+
+### 为什么需要
+
+Cloudflare Pages 默认**只在 git push 时构建**。但本站内容来自 Notion——你在 Notion 里改了内容，仓库代码没变，Pages 不会重新构建，线上就看不到更新。
+
+解决办法是用 **Deploy Hook**：一个专属 URL，对它发 POST 请求就能拉起一次构建。再配一个定时器按计划调用它，即可让线上内容自动跟随 Notion。
+
+### 第 1 步：创建 Deploy Hook
+
+1. Cloudflare Dashboard → **Workers & Pages** → 选择你的 Pages 项目
+2. **Settings** → **Builds** → **Add deploy hook**
+3. 填写：
+   - **Deploy hook name**：`notion-sync`（任意唯一标识）
+   - **Branch to build**：你的生产分支（`master` 或 `main`）
+4. 创建后复制生成的 URL，形如：
+   ```
+   https://api.cloudflare.com/client/v4/pages/webhooks/deploy_hooks/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+   ```
+
+> ⚠️ **安全提醒**：Deploy Hook URL **无需任何认证**即可触发构建，等同于密码。
+> 不要提交到仓库、不要写在前端代码里。下文两种方案都把它存为密钥。
+
+先验证 Hook 本身可用：
+
+```bash
+curl -X POST "https://api.cloudflare.com/client/v4/pages/webhooks/deploy_hooks/<你的ID>"
+```
+
+回到 Pages 项目的 **Deployments** 列表，应能看到一条新构建，其 **Source** 列显示为 Deploy Hook。
+
+### 第 2 步：选一种定时方案
+
+| 方案 | 适合场景 | 依赖 |
+|---|---|---|
+| **A. Workers Cron Trigger**（推荐） | 希望全部在 Cloudflare 生态内完成 | 需额外部署一个 Worker |
+| **B. GitHub Actions 定时** | 仓库在 GitHub，不想多部署一个 Worker | 需 GitHub repo secret |
+
+两者任选其一即可，**不要同时启用**（会重复构建、浪费额度）。
+
+---
+
+#### 方案 A：Workers Cron Trigger（推荐）
+
+本项目已内置 Worker 代码，位于 `cloudflare/rebuild-worker/`。
+
+**1. 部署 Worker**
+
+```bash
+cd cloudflare/rebuild-worker
+npx wrangler deploy
+```
+
+**2. 存入 Deploy Hook URL（作为密钥）**
+
+```bash
+npx wrangler secret put DEPLOY_HOOK_URL
+# 粘贴第 1 步得到的 URL
+```
+
+**3.（可选）启用手动触发端点**
+
+```bash
+npx wrangler secret put REBUILD_TOKEN
+# 输入一个自定义令牌，例如用 openssl rand -hex 16 生成
+```
+
+配置后可手动触发一次构建：
+
+```bash
+curl -X POST https://zeizeijie-rebuild.<你的子域>.workers.dev/rebuild \
+  -H "x-rebuild-token: <你的 REBUILD_TOKEN>"
+```
+
+> 未设置 `REBUILD_TOKEN` 时该端点自动返回 403（安全默认，无需担心暴露）。
+
+**4. 调整时间**
+
+编辑 `cloudflare/rebuild-worker/wrangler.toml` 的 `crons`：
+
+```toml
+[triggers]
+crons = ["0 1 * * *"]
+```
+
+> ⚠️ **Cron 按 UTC 执行**，北京时间 = UTC + 8。
+
+| cron（UTC） | 北京时间 | 月构建次数 |
+|---|---|---|
+| `0 1 * * *` | 每天 09:00 | ≈ 30 |
+| `0 13 * * *` | 每天 21:00 | ≈ 30 |
+| `0 1,13 * * *` | 每天 09:00 与 21:00 | ≈ 60 |
+| `0 1 * * MON` | 每周一 09:00 | ≈ 4 |
+| `*/30 * * * *` | 每 30 分钟 | ≈ 1440 ⚠️ 会超出免费额度 |
+
+改完后重新 `npx wrangler deploy`，**最多 15 分钟**后在全球网络生效。
+
+**查看执行记录**：Workers → 你的 Worker → **Settings** → **Trigger Events** → **View events**（保留最近 100 次）。
+
+---
+
+#### 方案 B：GitHub Actions 定时
+
+仓库已内置 `.github/workflows/rebuild.yml`，**默认关闭定时**（避免与方案 A 重复构建），
+开箱即可手动触发。启用定时只需两步：
+
+**1. 启用定时**
+
+编辑 `.github/workflows/rebuild.yml`，把 `schedule` 段的注释取消：
+
+```yaml
+on:
+  schedule:
+    # 每天 UTC 01:00 = 北京时间 09:00（约 30 次/月）
+    - cron: "0 1 * * *"
+  workflow_dispatch:
+```
+
+**2. 存入 Deploy Hook URL**
+
+GitHub 仓库 → **Settings → Secrets and variables → Actions → New repository secret**，
+添加 `DEPLOY_HOOK_URL`，值为第 1 步得到的 URL。
+
+**手动触发一次**（无需等待定时）：
+
+GitHub 仓库 → **Actions** → 选 `Rebuild site (Notion sync)` → **Run workflow**。
+
+> 注意：GitHub Actions 的 `schedule` 同样按 **UTC** 执行；且在仓库长期无活动后可能被停用，
+> 另外高峰时段 cron 可能延迟数分钟——**不保证准点**。对本站这种每天一次的场景无影响。
+>
+> 未配置 `DEPLOY_HOOK_URL` 时该 workflow 会直接报错退出（不会静默失败）。
+
+---
+
+### 构建额度与频率建议
+
+Cloudflare Pages 各方案的构建上限：
+
+| 方案 | 每月构建数 | 并发构建 |
+|---|---|---|
+| Free | 500 | 1 |
+| Pro | 5,000 | 5 |
+| Business | 20,000 | 20 |
+
+单次构建超时为 20 分钟；本站构建约 1 秒，不会触及。
+
+**建议：每天 1 次（≈30 次/月）**。Notion 属于低频内容源，每天同步一次完全够用，且距 500 次上限余量充足。
+
+> 避免「每次 Notion 变更都构建」——Notion 没有开箱即用的 webhook，需自建轮询，
+> 且频繁构建会很快耗尽额度、还容易撞上「同时只能 1 个构建」的限制。
+
+### 验证定时是否生效
+
+```bash
+# 1. 查看最近的 Cron 触发记录
+cd cloudflare/rebuild-worker && npx wrangler tail
+
+# 2. 确认构建的 Source 是 Deploy Hook
+#    Dashboard → Pages 项目 → Deployments → 查看 Source 列
+
+# 3. 确认线上内容确实更新了
+curl -s https://<你的域名>/data.js | grep -o '"name":"[^"]*"' | head -3
+```
+
+### 常见问题
+
+| 现象 | 原因与解决 |
+|---|---|
+| 定时到了但没构建 | Cron 改动需重新 deploy，且最多 15 分钟才生效 |
+| 日志显示「未配置 DEPLOY_HOOK_URL」 | 忘记 `wrangler secret put`；注意 secret 不会随代码走，换机器需重设 |
+| 内容与 Notion 不一致 | 检查 Pages 环境变量 `NOTION_TOKEN` 是否已配置；未配置会降级为本地数据 |
+| 触发了但构建失败 | 看 Pages 的构建日志；常见于 `NODE_VERSION` 未设置 |
+| 想临时停掉定时 | Worker 方案：把 `crons` 改为 `[]` 再 deploy；Actions 方案：在 GitHub 停用 workflow |
+
+---
+
 ## 配置说明
 
 ### `_headers`（响应头）
