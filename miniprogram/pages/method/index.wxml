@@ -1,0 +1,34 @@
+<!-- 方法论列表：intro + 分类筛选芯片 + 方法论卡网格 -->
+<view class="method page">
+  <empty-state wx:if="{{ !ready }}" type="error" text="数据加载失败，请重进小程序" />
+
+  <block wx:else>
+    <view class="head">
+      <view class="eyebrow">METHODOLOGY</view>
+      <view class="h1">方法论</view>
+      <view wx:if="{{ intro }}" class="lead head-intro">{{ intro }}</view>
+    </view>
+
+    <view class="chips-wrap">
+      <chip-bar items="{{ chips }}" active="{{ filter }}" bind:pick="onChip" />
+    </view>
+
+    <empty-state
+      wx:if="{{ articles.length === 0 }}"
+      type="empty"
+      text="这个分类下还没有文章"
+      action-label="查看全部"
+      bind:action="onEmptyAction"
+    />
+
+    <view wx:else class="grid-2 method-grid">
+      <reveal wx:for="{{ articles }}" wx:key="id" delay="{{ index * 60 }}">
+        <method-card
+          article="{{ item }}"
+          cat-name="{{ catName[item.category] }}"
+          bind:tap="onTapCard"
+        />
+      </reveal>
+    </view>
+  </block>
+</view>

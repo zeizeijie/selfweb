@@ -1,0 +1,18 @@
+<!-- 空态 / 错误态：文案 + 可选按钮 -->
+<view class="empty-state">
+  <text class="state-text">{{ shownText }}</text>
+
+  <button
+    wx:if="{{ isError }}"
+    class="state-btn state-btn--primary"
+    size="mini"
+    bindtap="onRetry"
+  >重试</button>
+
+  <button
+    wx:elif="{{ actionLabel }}"
+    class="state-btn"
+    size="mini"
+    bindtap="onAction"
+  >{{ actionLabel }}</button>
+</view>

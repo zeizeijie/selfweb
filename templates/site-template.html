@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>知识花园 · 个人知识站</title>
+<!-- 注意：本文件是「纯净模板」，由 templates/site-template.html 同步而来。
+     构建脚本读取本文件并注入 canonical / og / twitter / __INITIAL_VIEW__ 后
+     输出到 site/dist/ 各入口页，绝不回写本文件，以保证构建幂等。
+     请勿手工在本文件添加 canonical / og / twitter / description 标签。 -->
+<link rel="stylesheet" href="styles.css">
+<link rel="preconnect" href="https://img9.doubanio.com">
+<meta name="theme-color" content="#0071e3">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+
+</head>
+<body>
+
+<noscript>
+  <div class="noscript">
+    本站需要启用 JavaScript 才能浏览。请在浏览器设置中开启 JavaScript 后重试。
+  </div>
+</noscript>
+
+<!-- ============ 导航 ============ -->
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="#/" class="nav-logo" data-link>
+      <span class="dot"></span><span id="logoText">知识花园</span>
+    </a>
+    <div class="nav-links" id="navLinks">
+      <a href="#/" data-link data-nav="home">首页</a>
+      <a href="#/ai" data-link data-nav="ai">AI 学习</a>
+      <a href="#/library" data-link data-nav="library">图书馆</a>
+      <a href="#/method" data-link data-nav="method">方法论</a>
+      <a href="#/travel" data-link data-nav="travel">旅行</a>
+      <a href="#/words" data-link data-nav="words">Words</a>
+    </div>
+    <button class="nav-toggle" id="navToggle" aria-label="菜单"><span></span></button>
+  </div>
+</nav>
+
+<!-- ============ 首页 ============ -->
+<main class="view active" id="view-home">
+  <section class="hero">
+    <div class="wrap">
+      <p class="eyebrow reveal">个人知识花园</p>
+      <h1 class="hero-title reveal">把散落的思考，<br>种成一片森林。</h1>
+      <p class="lead sub reveal center mx-auto narrow">
+        这里收集我在 Notion 里的五块地方——<br class="hide-sm">用 AI 做的小玩意、读过的书、验证过的方法、走过的路，和击中过我的话。
+      </p>
+      <div class="cta reveal">
+        <a class="btn btn-primary" href="#/library" data-link>进入图书馆 →</a>
+        <a class="btn btn-ghost" href="#/method" data-link>看看方法论</a>
+      </div>
+      <div class="hero-meta reveal" id="heroMeta"></div>
+    </div>
+  </section>
+
+  <section class="section tight">
+    <div class="wrap">
+      <h2 class="sec-title center reveal">五个空间</h2>
+      <p class="lead center mx-auto narrow reveal" style="margin-top:14px">
+        每一个模块，都是一条持续生长的线索。
+      </p>
+      <div class="spaces stagger reveal" id="moduleGrid" style="margin-top:56px"></div>
+    </div>
+  </section>
+
+  <section class="section tight">
+    <div class="wrap">
+      <div class="feature-strip reveal">
+        <h2>为什么把它做成网站？</h2>
+        <div class="cols">
+          <div class="col">
+            <h4>看得见进度</h4>
+            <p>书读了多少、方法用了多久、清单打勾了几项——把它们放进一个页面，坚持就有了形状。</p>
+          </div>
+          <div class="col">
+            <h4>找得到痕迹</h4>
+            <p>笔记不该埋在数据库角落里。好的句子、走过的路、想通的事，应该被整齐地摆出来。</p>
+          </div>
+          <div class="col">
+            <h4>留得住手感</h4>
+            <p>克制的排版、呼吸感的留白、安静的动效——让注意力回到内容本身，而不是界面。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ============ AI 学习 ============ -->
+<main class="view" id="view-ai">
+  <section class="page-head">
+    <div class="wrap">
+      <p class="eyebrow reveal">AI 学习</p>
+      <h1 class="hero-title reveal" style="font-size:clamp(36px,5.4vw,62px)">动手，是最好的学习方式。</h1>
+      <p class="lead reveal" id="aiIntro"></p>
+    </div>
+  </section>
+  <section class="section tight">
+    <div class="wrap" id="aiProjects"></div>
+  </section>
+</main>
+
+<!-- ============ 图书馆 ============ -->
+<main class="view" id="view-library">
+  <section class="page-head">
+    <div class="wrap">
+      <p class="eyebrow reveal">图书馆</p>
+      <h1 class="hero-title reveal" style="font-size:clamp(36px,5.4vw,62px)">阅读是一座随身携带的避难所。</h1>
+      <p class="lead reveal" id="libIntro"></p>
+    </div>
+  </section>
+  <section class="section tight">
+    <div class="wrap">
+      <div class="chips reveal" id="libChips"></div>
+      <div class="book-grid reveal" id="bookGrid"></div>
+      <div style="margin-top:64px">
+        <h2 class="sec-title reveal" style="font-size:26px">喜欢的作者</h2>
+        <div class="chips reveal" id="favAuthors" style="justify-content:flex-start;margin-top:22px;margin-bottom:0"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ============ 方法论 ============ -->
+<main class="view" id="view-method">
+  <section class="page-head">
+    <div class="wrap">
+      <p class="eyebrow reveal">方法论</p>
+      <h1 class="hero-title reveal" style="font-size:clamp(36px,5.4vw,62px)">把踩过的坑，炼成下一次的弹药。</h1>
+      <p class="lead reveal" id="methodIntro"></p>
+    </div>
+  </section>
+  <section class="section tight">
+    <div class="wrap">
+      <div class="chips reveal" id="methodChips"></div>
+      <div class="grid-3 reveal" id="methodGrid"></div>
+    </div>
+  </section>
+</main>
+
+<!-- ============ 旅行 ============ -->
+<main class="view" id="view-travel">
+  <section class="page-head">
+    <div class="wrap">
+      <p class="eyebrow reveal">旅行</p>
+      <h1 class="hero-title reveal" style="font-size:clamp(36px,5.4vw,62px)">出发，就是最好的准备。</h1>
+      <p class="lead reveal" id="travelIntro"></p>
+    </div>
+  </section>
+  <section class="section tight">
+    <div class="wrap">
+      <div class="grid-2 reveal" id="tripGrid"></div>
+    </div>
+  </section>
+</main>
+
+<!-- ============ Words ============ -->
+<main class="view" id="view-words">
+  <section class="page-head">
+    <div class="wrap">
+      <p class="eyebrow reveal">Words</p>
+      <h1 class="hero-title reveal" style="font-size:clamp(36px,5.4vw,62px)">记下那些击中过我的话。</h1>
+      <p class="lead reveal" id="wordsIntro"></p>
+    </div>
+  </section>
+  <section class="section tight">
+    <div class="wrap">
+      <div class="chips reveal" id="wordsChips"></div>
+      <div class="words-masonry reveal" id="wordsList"></div>
+    </div>
+  </section>
+</main>
+
+<!-- ============ 页脚 ============ -->
+<footer class="footer">
+  <div class="f-inner">
+    <div>
+      <div class="f-brand">知识花园</div>
+      <div class="f-note" id="footNote">内容整理自个人 Notion 工作区 · 设计灵感来自 Apple</div>
+    </div>
+    <div class="f-links">
+      <a href="ai.html" data-link data-nav="ai">AI 学习</a>
+      <a href="library.html" data-link data-nav="library">图书馆</a>
+      <a href="method.html" data-link data-nav="method">方法论</a>
+      <a href="travel.html" data-link data-nav="travel">旅行</a>
+      <a href="words.html" data-link data-nav="words">Words</a>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ 弹层 ============ -->
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="详情">
+    <button class="modal-close" id="modalClose" aria-label="关闭">✕</button>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

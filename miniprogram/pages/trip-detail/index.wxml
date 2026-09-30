@@ -1,0 +1,73 @@
+<!-- 行程详情：渐变 banner + 摘要 + sections/checklists + tip -->
+<view class="trip-detail">
+  <empty-state
+    wx:if="{{ ready && notFound }}"
+    type="error"
+    text="没有找到这段行程（id 无效或已移除）"
+    bind:retry="onRetry"
+  />
+
+  <view wx:elif="{{ !ready }}" class="loading page">
+    <view class="skeleton sk-banner"></view>
+    <view class="skeleton sk-line" style="width: 90%"></view>
+    <view class="skeleton sk-line" style="width: 70%"></view>
+  </view>
+
+  <block wx:else>
+    <!-- 渐变 banner -->
+    <view class="td-banner" style="background: {{ cover }}">
+      <view class="td-loc">{{ trip.location }}</view>
+      <view class="td-title">{{ trip.title }}</view>
+      <view class="td-badges">
+        <text wx:if="{{ trip.date }}" class="td-badge">{{ trip.date }}</text>
+        <text wx:if="{{ trip.altitude }}" class="td-badge">{{ trip.altitude }}</text>
+      </view>
+    </view>
+
+    <view class="page-body">
+      <view wx:if="{{ trip.summary }}" class="td-summary">{{ trip.summary }}</view>
+
+      <!-- sections -->
+      <view wx:if="{{ sections.length }}" class="td-sections">
+        <view wx:for="{{ sections }}" wx:key="index" class="td-sec">
+          <view class="td-sec-head">
+            <text class="td-sec-ico">{{ item.icon === 'route' ? '🧭' : item.icon === 'clock' ? '🕐' : item.icon === 'bag' ? '🎒' : item.icon === 'wallet' ? '💰' : item.icon === 'sun' ? '☀️' : item.icon === 'drop' ? '💧' : item.icon === 'device' ? '📱' : '💊' }}</text>
+            <text class="td-sec-title">{{ item.title }}</text>
+          </view>
+          <view class="td-items">
+            <view wx:for="{{ item.items }}" wx:for-item="li" wx:key="*this" class="td-item">
+              <text class="td-dot">•</text>
+              <text class="td-item-text">{{ li }}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- checklists -->
+      <view wx:if="{{ checklists.length }}" class="td-sections">
+        <view class="td-sec">
+          <view class="td-sec-head">
+            <text class="td-sec-ico">🎒</text>
+            <text class="td-sec-title">装备勾选清单</text>
+          </view>
+          <view class="check-chips">
+            <block wx:for="{{ checklists }}" wx:for-item="group" wx:for-index="gi" wx:key="gi">
+              <text
+                wx:for="{{ group }}"
+                wx:for-item="cc"
+                wx:key="index"
+                class="cc {{ cc.pending ? 'cc--pending' : '' }}"
+              >{{ cc.pending ? '○ ' : '✓ ' }}{{ cc.text }}</text>
+            </block>
+          </view>
+        </view>
+      </view>
+
+      <!-- tip -->
+      <view wx:if="{{ tip }}" class="tip-box">
+        <text class="tip-ico">💡</text>
+        <text class="tip-text">{{ tip }}</text>
+      </view>
+    </view>
+  </block>
+</view>

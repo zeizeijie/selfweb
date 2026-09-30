@@ -1,0 +1,61 @@
+<!-- 首页：hero + 数据统计 + 5 模块卡 + 页脚 -->
+<view class="home">
+  <!-- 空态/错误态 -->
+  <empty-state
+    wx:if="{{ !ready }}"
+    type="error"
+    text="数据加载失败，请下拉刷新或重进小程序"
+  />
+
+  <block wx:else>
+    <!-- Hero -->
+    <view class="hero">
+      <view class="eyebrow">PERSONAL KNOWLEDGE GARDEN</view>
+      <view class="h1 hero-title">{{ meta.name }}</view>
+      <view class="lead hero-sub">{{ meta.subtitle }}</view>
+      <view class="hero-tag">{{ meta.tagline }}</view>
+
+      <!-- 数据统计 -->
+      <view class="stats">
+        <view wx:for="{{ stats }}" wx:key="label" class="stat">
+          <view class="stat-num">{{ item.value }}</view>
+          <view class="stat-label">{{ item.label }}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 5 模块卡 -->
+    <view class="grid-modules">
+      <reveal wx:for="{{ modules }}" wx:key="id" delay="{{ index * 60 }}">
+        <view
+          class="module-card"
+          data-path="{{ item.path }}"
+          bindtap="onTapModule"
+          hover-class="module-card--hover"
+          hover-stay-time="80"
+        >
+          <view class="mc-head">
+            <view class="mc-ico" style="background: {{ item.color }}">📁</view>
+            <view class="mc-count">{{ item.count }}</view>
+          </view>
+          <view class="mc-name">{{ item.name }}</view>
+          <view class="mc-tag">{{ item.tagline }}</view>
+          <view class="mc-desc">{{ item.desc }}</view>
+          <view class="mc-foot">
+            <text class="mc-num">{{ item.count }}</text>
+            <text class="mc-arrow">→</text>
+          </view>
+        </view>
+      </reveal>
+    </view>
+
+    <!-- 页脚 -->
+    <view class="foot">
+      <view class="foot-line"></view>
+      <view class="foot-text">
+        内容整理自个人 Notion 工作区 · 设计灵感来自 Apple
+      </view>
+      <view wx:if="{{ owner }}" class="foot-owner">{{ owner }}</view>
+    </view>
+  </block>
+</view>

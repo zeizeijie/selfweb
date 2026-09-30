@@ -1,0 +1,30 @@
+/* 筛选芯片组（对齐网站 .chips） */
+.chip-bar {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.chip-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 4rpx 0;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  background: var(--bg-alt);
+  border-radius: 999rpx;
+  padding: 12rpx 28rpx;
+  line-height: 1.4;
+  transition: background .3s var(--ease), color .3s var(--ease);
+}
+
+.chip--on {
+  color: #fff;
+  background: var(--blue);
+}

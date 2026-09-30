@@ -1,0 +1,64 @@
+/* Words 列表（移动端单列卡片流，保证阅读节奏） */
+.page {
+  padding-bottom: 80rpx;
+}
+
+.head {
+  padding: 72rpx var(--gap-page) 24rpx;
+}
+.head-intro {
+  margin-top: 20rpx;
+}
+
+.chips-wrap {
+  padding: 8rpx var(--gap-page) 32rpx;
+}
+
+.list {
+  padding: 0 var(--gap-page);
+}
+
+.word-card {
+  position: relative;
+  background: var(--bg-alt);
+  border-radius: var(--radius-l);
+  padding: 48rpx 44rpx 40rpx;
+  margin-bottom: 32rpx;
+}
+
+.quote-mark {
+  font-size: 64rpx;
+  line-height: 1;
+  color: var(--c-words);
+  opacity: 0.35;
+  font-weight: 700;
+}
+
+.w-text {
+  margin-top: 4rpx;
+  font-size: 32rpx;
+  line-height: 1.7;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.w-meta {
+  margin-top: 28rpx;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10rpx;
+  font-size: 24rpx;
+  color: var(--text-tertiary);
+}
+.who {
+  color: var(--text-secondary);
+}
+.w-cat {
+  margin-left: auto;
+  font-size: 22rpx;
+  color: var(--c-words);
+  background: rgba(194, 64, 95, .1);
+  border-radius: 999rpx;
+  padding: 6rpx 18rpx;
+}

@@ -1,0 +1,42 @@
+<!-- 更多：旅行 + Words 入口 + 站点信息 -->
+<view class="more page">
+  <empty-state wx:if="{{ !ready }}" type="error" text="数据加载失败，请重进小程序" />
+
+  <block wx:else>
+    <view class="head">
+      <view class="eyebrow">MORE</view>
+      <view class="h1">更多</view>
+      <view class="lead head-intro">探索剩下的两个空间：旅行与 Words。</view>
+    </view>
+
+    <view class="entries">
+      <reveal wx:for="{{ entries }}" wx:key="id" delay="{{ index * 80 }}">
+        <view
+          class="entry"
+          data-path="{{ item.path }}"
+          bindtap="onTapEntry"
+          hover-class="entry--hover"
+          hover-stay-time="80"
+        >
+          <view class="entry-ico" style="background: {{ item.color }}">◈</view>
+          <view class="entry-body">
+            <view class="entry-name">{{ item.name }}</view>
+            <view class="entry-tag">{{ item.tagline }}</view>
+          </view>
+          <view class="entry-right">
+            <view class="entry-count">{{ item.count }}</view>
+            <view class="entry-unit">{{ item.unit }}</view>
+          </view>
+        </view>
+      </reveal>
+    </view>
+
+    <view class="about" wx:if="{{ meta }}">
+      <view class="about-line"></view>
+      <view class="about-name">{{ meta.name }}</view>
+      <view class="about-sub">{{ meta.subtitle }}</view>
+      <view wx:if="{{ meta.owner }}" class="about-owner">{{ meta.owner }}</view>
+      <view class="about-tag">{{ meta.tagline }}</view>
+    </view>
+  </block>
+</view>

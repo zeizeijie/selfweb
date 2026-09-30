@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "知识花园",
+  "usingComponents": {
+    "reveal": "/components/reveal/index",
+    "empty-state": "/components/empty-state/index"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "更多",
+  "usingComponents": {
+    "reveal": "/components/reveal/index",
+    "empty-state": "/components/empty-state/index"
+  }
+}

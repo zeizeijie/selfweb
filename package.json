@@ -1,0 +1,20 @@
+{
+  "name": "knowledge-garden",
+  "version": "1.0.0",
+  "private": true,
+  "description": "个人知识花园 · 双端（静态站 + 原生微信小程序）内容构建链",
+  "type": "commonjs",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "build": "node tools/build.js",
+    "build:no-notion": "node tools/build.js --no-notion",
+    "make-icons": "node tools/make-icons.js",
+    "test": "node --test tools/normalize.test.js",
+    "verify": "node tools/build.js && node tools/verify.js",
+    "verify:mp": "node tools/verify-miniprogram.js",
+    "verify:logic": "node tools/sim-miniprogram.js",
+    "check": "node tools/build.js && node tools/verify.js && node tools/verify-miniprogram.js && node tools/sim-miniprogram.js"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

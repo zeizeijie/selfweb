@@ -1,0 +1,20 @@
+/* 方法论列表（移动端 2 列，保证卡片可读） */
+.page {
+  padding-bottom: 80rpx;
+}
+
+.head {
+  padding: 72rpx var(--gap-page) 24rpx;
+}
+.head-intro {
+  margin-top: 20rpx;
+}
+
+.chips-wrap {
+  padding: 8rpx var(--gap-page) 32rpx;
+}
+
+.method-grid {
+  padding: 0 var(--gap-page);
+  align-items: stretch;
+}

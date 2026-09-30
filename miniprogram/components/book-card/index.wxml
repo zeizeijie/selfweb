@@ -1,0 +1,23 @@
+<!-- 书籍卡片：封面（可降级）+ 书名 + 作者 + 评分 + 笔记提示 -->
+<view class="book-card" bindtap="onTap" hover-class="book-card--hover" hover-stay-time="80">
+  <view
+    class="cover"
+    style="background: {{ coverOk && hasCover ? '' : fallback }};"
+  >
+    <image
+      wx:if="{{ coverOk && hasCover }}"
+      class="cover-img"
+      src="{{ book.cover }}"
+      mode="aspectFill"
+      lazy-load="{{ true }}"
+      binderror="onCoverError"
+    />
+    <text wx:else class="fallback-title">{{ book.title }}</text>
+    <text wx:if="{{ statusText }}" class="badge">{{ statusText }}</text>
+  </view>
+
+  <view class="b-title">{{ book.title }}</view>
+  <view wx:if="{{ showMeta }}" class="b-author">{{ book.author || '—' }}</view>
+  <view wx:if="{{ showMeta && starStr }}" class="b-stars">{{ starStr }}</view>
+  <view wx:if="{{ showMeta && book.noteAvailable }}" class="b-note">✎ 有读书笔记</view>
+</view>

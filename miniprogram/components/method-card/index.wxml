@@ -1,0 +1,10 @@
+<!-- 方法论卡片：分类标签 + 标题 + 摘要 + 元信息 -->
+<view class="method-card" bindtap="onTap" hover-class="method-card--hover" hover-stay-time="80">
+  <text wx:if="{{ cat }}" class="cat-tag">{{ cat }}</text>
+  <view class="card-title">{{ title }}</view>
+  <view class="summary">{{ summary }}</view>
+  <view class="meta">
+    <text>{{ readingTime }}</text>
+    <text class="read-more">阅读全文 →</text>
+  </view>
+</view>

@@ -1,0 +1,92 @@
+/* AI 学习列表（对齐网站 .project 交错卡） */
+.page {
+  padding-bottom: 80rpx;
+}
+
+.head {
+  padding: 72rpx var(--gap-page) 24rpx;
+}
+.head-intro {
+  margin-top: 20rpx;
+}
+
+.list {
+  padding: 0 var(--gap-page);
+}
+
+.project {
+  background: var(--bg-alt);
+  border-radius: var(--radius-l);
+  overflow: hidden;
+  margin-bottom: 40rpx;
+}
+
+.p-visual {
+  height: 240rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.big-ico {
+  font-size: 96rpx;
+  color: rgba(255, 255, 255, .9);
+}
+
+.p-body {
+  padding: 40rpx 44rpx 44rpx;
+}
+
+.p-title {
+  margin-top: 20rpx;
+  font-size: 42rpx;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+.p-sum {
+  margin-top: 16rpx;
+  font-size: 28rpx;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+.p-tags {
+  margin-top: 24rpx;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+.tag {
+  font-size: 22rpx;
+  color: var(--text-secondary);
+  background: rgba(0, 0, 0, .05);
+  border-radius: 999rpx;
+  padding: 6rpx 20rpx;
+}
+
+.p-list {
+  margin-top: 28rpx;
+  padding-top: 24rpx;
+  border-top: 1px solid var(--line);
+}
+.p-li {
+  display: flex;
+  gap: 12rpx;
+  margin-bottom: 12rpx;
+}
+.dot {
+  color: var(--text-tertiary);
+  line-height: 1.6;
+}
+.p-li-text {
+  flex: 1;
+  font-size: 27rpx;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* 已完成状态点变灰（对齐网站 .status.done） */
+.status--done .sd {
+  background: var(--text-tertiary);
+}

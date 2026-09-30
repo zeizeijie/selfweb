@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "方法论",
+  "usingComponents": {
+    "chip-bar": "/components/chip-bar/index",
+    "method-card": "/components/method-card/index",
+    "reveal": "/components/reveal/index",
+    "empty-state": "/components/empty-state/index"
+  }
+}

@@ -1,0 +1,12 @@
+<!-- 筛选芯片组：横向滚动 -->
+<scroll-view class="chip-bar" scroll-x="{{ true }}" enhanced="{{ true }}" show-scrollbar="{{ false }}">
+  <view class="chip-row">
+    <view
+      wx:for="{{ renderItems }}"
+      wx:key="id"
+      class="chip {{ item.on ? 'chip--on' : '' }}"
+      data-value="{{ item.id }}"
+      bindtap="onPick"
+    >{{ item.name }} · {{ item.count }}</view>
+  </view>
+</scroll-view>

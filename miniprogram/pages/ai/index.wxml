@@ -1,0 +1,41 @@
+<!-- AI 学习列表：intro + 3 项目卡 -->
+<view class="ai page">
+  <empty-state wx:if="{{ !ready }}" type="error" text="数据加载失败，请重进小程序" />
+
+  <block wx:else>
+    <view class="head">
+      <view class="eyebrow">AI LEARNING</view>
+      <view class="h1">AI 学习</view>
+      <view wx:if="{{ intro }}" class="lead head-intro">{{ intro }}</view>
+    </view>
+
+    <empty-state wx:if="{{ projects.length === 0 }}" type="empty" text="还没有记录 AI 项目" />
+
+    <view wx:else class="list">
+      <reveal wx:for="{{ projects }}" wx:key="id" delay="{{ index * 80 }}">
+        <view class="project">
+          <view class="p-visual" style="background: linear-gradient(140deg, {{ item.color }}, rgba(0,0,0,.35))">
+            <view class="big-ico">◈</view>
+          </view>
+          <view class="p-body">
+            <view class="status {{ item.done ? 'status--done' : '' }}">
+              <view class="sd"></view>
+              <text>{{ item.status }}</text>
+            </view>
+            <view class="p-title">{{ item.title }}</view>
+            <view class="p-sum">{{ item.summary }}</view>
+            <view wx:if="{{ item.tags.length }}" class="p-tags">
+              <text wx:for="{{ item.tags }}" wx:for-item="tg" wx:key="*this" class="tag">{{ tg }}</text>
+            </view>
+            <view wx:if="{{ item.highlights.length }}" class="p-list">
+              <view wx:for="{{ item.highlights }}" wx:for-item="hl" wx:key="*this" class="p-li">
+                <text class="dot">•</text>
+                <text class="p-li-text">{{ hl }}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </reveal>
+    </view>
+  </block>
+</view>

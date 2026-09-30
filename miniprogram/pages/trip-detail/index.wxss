@@ -1,0 +1,144 @@
+/* 行程详情样式（对齐网站 .trip-detail） */
+
+/* ---------- 加载骨架 ---------- */
+.loading {
+  padding-top: 48rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+.sk-banner {
+  width: 100%;
+  height: 400rpx;
+  border-radius: var(--radius-l);
+}
+.sk-line {
+  height: 40rpx;
+}
+
+/* ---------- 渐变 banner ---------- */
+.td-banner {
+  padding: 120rpx var(--gap-page) 80rpx;
+  color: #fff;
+}
+.td-loc {
+  font-size: 28rpx;
+  opacity: 0.9;
+  letter-spacing: 0.02em;
+}
+.td-title {
+  margin-top: 16rpx;
+  font-size: 56rpx;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.25;
+}
+.td-badges {
+  margin-top: 32rpx;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+.td-badge {
+  font-size: 24rpx;
+  color: #fff;
+  background: rgba(255, 255, 255, .2);
+  border-radius: 999rpx;
+  padding: 8rpx 24rpx;
+}
+
+/* ---------- 正文 ---------- */
+.page-body {
+  padding: 48rpx var(--gap-page) 112rpx;
+}
+
+.td-summary {
+  font-size: 32rpx;
+  color: #48484a;
+  line-height: 1.75;
+  letter-spacing: -0.01em;
+  margin-bottom: 48rpx;
+}
+
+.td-sections {
+  margin-top: 8rpx;
+}
+
+.td-sec {
+  margin-bottom: 48rpx;
+}
+.td-sec-head {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 24rpx;
+}
+.td-sec-ico {
+  font-size: 36rpx;
+}
+.td-sec-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.td-items {
+  padding-left: 4rpx;
+}
+.td-item {
+  display: flex;
+  gap: 14rpx;
+  margin-bottom: 16rpx;
+}
+.td-dot {
+  color: var(--text-tertiary);
+  font-size: 30rpx;
+  line-height: 1.7;
+}
+.td-item-text {
+  flex: 1;
+  font-size: 30rpx;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+/* ---------- 清单芯片 ---------- */
+.check-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+.cc {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  background: var(--bg-alt);
+  border: 1px solid var(--line);
+  border-radius: 999rpx;
+  padding: 12rpx 28rpx;
+  line-height: 1.3;
+}
+/* 「（待补）」待办虚线样式 */
+.cc--pending {
+  opacity: 0.6;
+  border-style: dashed;
+}
+
+/* ---------- tip 提示框 ---------- */
+.tip-box {
+  margin-top: 16rpx;
+  display: flex;
+  gap: 16rpx;
+  padding: 32rpx;
+  background: rgba(15, 138, 106, .08);
+  border-radius: var(--radius-m);
+}
+.tip-ico {
+  font-size: 32rpx;
+  line-height: 1.6;
+}
+.tip-text {
+  flex: 1;
+  font-size: 28rpx;
+  line-height: 1.7;
+  color: #2b7a63;
+}

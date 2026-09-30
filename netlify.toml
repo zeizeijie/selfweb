@@ -1,0 +1,26 @@
+# Netlify 部署配置
+[build]
+  command = "npm run build"
+  publish = "site/dist"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+# SPA/hash 路由 + 预渲染入口：先尝试命中真实文件，未命中回退 404
+[[redirects]]
+  from = "/*"
+  to = "/404.html"
+  status = 404
+
+# 静态资源长缓存
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "SAMEORIGIN"
+    Referrer-Policy = "strict-origin-when-cross-origin"

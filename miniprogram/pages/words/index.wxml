@@ -1,0 +1,39 @@
+<!-- Words 列表：intro + 分类筛选芯片 + 单列卡片流 -->
+<view class="words page">
+  <empty-state wx:if="{{ !ready }}" type="error" text="数据加载失败，请重进小程序" />
+
+  <block wx:else>
+    <view class="head">
+      <view class="eyebrow">WORDS</view>
+      <view class="h1">Words</view>
+      <view wx:if="{{ intro }}" class="lead head-intro">{{ intro }}</view>
+    </view>
+
+    <view class="chips-wrap">
+      <chip-bar items="{{ chips }}" active="{{ filter }}" bind:pick="onChip" />
+    </view>
+
+    <empty-state
+      wx:if="{{ words.length === 0 }}"
+      type="empty"
+      text="这个分类下还没有收藏"
+      action-label="查看全部"
+      bind:action="onEmptyAction"
+    />
+
+    <view wx:else class="list">
+      <reveal wx:for="{{ words }}" wx:key="id" delay="{{ index * 30 > 300 ? 300 : index * 30 }}">
+        <view class="word-card" data-text="{{ item.text }}" bindlongpress="onCopy">
+          <view class="quote-mark">“</view>
+          <view class="w-text">{{ item.text }}</view>
+          <view class="w-meta">
+            <text wx:if="{{ item.author }}" class="who">{{ item.author }}</text>
+            <text wx:if="{{ item.author && item.source }}" class="sep">·</text>
+            <text wx:if="{{ item.source }}">{{ item.source }}</text>
+            <text class="w-cat">{{ item.category }}</text>
+          </view>
+        </view>
+      </reveal>
+    </view>
+  </block>
+</view>

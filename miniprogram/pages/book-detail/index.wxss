@@ -1,0 +1,127 @@
+/* 书籍详情样式（对齐网站 .book-detail） */
+.page {
+  padding: 48rpx var(--gap-page) 96rpx;
+}
+
+/* ---------- 加载骨架 ---------- */
+.loading {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+.sk-cover {
+  width: 100%;
+  height: 480rpx;
+}
+.sk-line {
+  height: 40rpx;
+}
+
+/* ---------- 顶部：封面 + 主信息 ---------- */
+.bd-top {
+  display: flex;
+  gap: 36rpx;
+}
+
+.bd-cover {
+  width: 240rpx;
+  height: 344rpx;
+  border-radius: 20rpx;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-alt);
+  box-shadow: 0 12rpx 44rpx rgba(0, 0, 0, .14);
+}
+.bd-cover-img {
+  width: 100%;
+  height: 100%;
+}
+
+.bd-main {
+  flex: 1;
+  min-width: 0;
+}
+.bd-title {
+  font-size: 46rpx;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+.bd-author {
+  margin-top: 12rpx;
+  font-size: 28rpx;
+  color: var(--text-secondary);
+}
+.bd-badges {
+  margin-top: 24rpx;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+.badge {
+  font-size: 22rpx;
+  color: var(--text-secondary);
+  background: var(--bg-alt);
+  border-radius: 999rpx;
+  padding: 8rpx 20rpx;
+}
+.bd-stars {
+  margin-top: 24rpx;
+  font-size: 32rpx;
+  color: var(--star);
+  letter-spacing: 3rpx;
+}
+
+/* ---------- 读书笔记 ---------- */
+.bd-notes {
+  margin-top: 64rpx;
+}
+.notes-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin-bottom: 32rpx;
+}
+
+.note {
+  margin-bottom: 32rpx;
+}
+
+/* 引用块 */
+.note--quote .note-quote-text {
+  display: block;
+  font-size: 30rpx;
+  line-height: 1.75;
+  color: var(--text-secondary);
+  padding: 24rpx 0 24rpx 32rpx;
+  border-left: 6rpx solid var(--blue);
+}
+.bq-src {
+  display: block;
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  color: var(--text-tertiary);
+  padding-left: 32rpx;
+}
+
+/* 点评样式（对齐网站：点评 · xxx） */
+.note--comment .note-comment-text {
+  display: block;
+  font-size: 30rpx;
+  line-height: 1.75;
+  color: #48484a;
+  background: var(--bg-alt);
+  border-radius: var(--radius-m);
+  padding: 28rpx 32rpx;
+}
+.note--comment::before {
+  content: "点评 · ";
+  display: inline-block;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--blue);
+  margin-bottom: 10rpx;
+}

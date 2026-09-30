@@ -1,0 +1,4 @@
+<!-- 滚动渐入容器 -->
+<view class="reveal-box {{ in ? 'reveal-box--in' : '' }}" style="{{ style }}">
+  <slot></slot>
+</view>

@@ -1,0 +1,53 @@
+/* 方法论卡片样式（对齐网站 .method-card） */
+.method-card {
+  background: var(--bg-alt);
+  border-radius: var(--radius-l);
+  padding: 48rpx 44rpx 40rpx;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.method-card--hover {
+  opacity: 0.92;
+}
+
+.cat-tag {
+  display: inline-block;
+  font-size: 22rpx;
+  color: var(--c-method);
+  background: rgba(110, 86, 207, .12);
+  border-radius: 999rpx;
+  padding: 6rpx 18rpx;
+  margin-bottom: 20rpx;
+}
+
+.card-title {
+  font-size: 38rpx;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+  color: var(--text);
+}
+
+.summary {
+  margin-top: 18rpx;
+  font-size: 28rpx;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+
+.meta {
+  margin-top: 28rpx;
+  display: flex;
+  justify-content: space-between;
+  font-size: 24rpx;
+  color: var(--text-tertiary);
+}
+
+.read-more {
+  color: var(--blue);
+}

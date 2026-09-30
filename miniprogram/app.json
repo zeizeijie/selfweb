@@ -1,0 +1,38 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/ai/index",
+    "pages/library/index",
+    "pages/method/index",
+    "pages/more/index",
+    "pages/travel/index",
+    "pages/words/index",
+    "pages/book-detail/index",
+    "pages/article-detail/index",
+    "pages/trip-detail/index"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "知识花园",
+    "backgroundColor": "#f5f5f7",
+    "backgroundTextStyle": "dark",
+    "enablePullDownRefresh": false
+  },
+  "tabBar": {
+    "color": "#86868b",
+    "selectedColor": "#0071e3",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      { "pagePath": "pages/index/index", "text": "首页", "iconPath": "assets/tabbar/home.png", "selectedIconPath": "assets/tabbar/home-on.png" },
+      { "pagePath": "pages/ai/index", "text": "AI 学习", "iconPath": "assets/tabbar/chip.png", "selectedIconPath": "assets/tabbar/chip-on.png" },
+      { "pagePath": "pages/library/index", "text": "图书馆", "iconPath": "assets/tabbar/book.png", "selectedIconPath": "assets/tabbar/book-on.png" },
+      { "pagePath": "pages/method/index", "text": "方法论", "iconPath": "assets/tabbar/compass.png", "selectedIconPath": "assets/tabbar/compass-on.png" },
+      { "pagePath": "pages/more/index", "text": "更多", "iconPath": "assets/tabbar/more.png", "selectedIconPath": "assets/tabbar/more-on.png" }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

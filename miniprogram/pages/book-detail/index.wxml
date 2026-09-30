@@ -1,0 +1,64 @@
+<!-- 书籍详情：封面 + 元信息 + 评分 + 读书笔记 -->
+<view class="book-detail page">
+  <!-- 错误态：id 无效 / 找不到 -->
+  <empty-state
+    wx:if="{{ ready && notFound }}"
+    type="error"
+    text="没有找到这本书（id 无效或已移除）"
+    bind:retry="onRetry"
+  />
+
+  <!-- 加载态（数据未就绪且未判定失败） -->
+  <view wx:elif="{{ !ready }}" class="loading">
+    <view class="skeleton sk-cover"></view>
+    <view class="skeleton sk-line" style="width: 60%"></view>
+    <view class="skeleton sk-line" style="width: 40%"></view>
+  </view>
+
+  <block wx:else>
+    <view class="bd-top">
+      <view class="bd-cover" style="background: {{ coverOk && hasCover ? '' : fallback }}">
+        <image
+          wx:if="{{ coverOk && hasCover }}"
+          class="bd-cover-img"
+          src="{{ book.cover }}"
+          mode="aspectFill"
+          lazy-load="{{ true }}"
+          binderror="onCoverError"
+        />
+        <text wx:else class="fallback-title">{{ book.title }}</text>
+      </view>
+
+      <view class="bd-main">
+        <view class="bd-title">{{ book.title }}</view>
+        <view class="bd-author">{{ book.author || '佚名' }}</view>
+        <view class="bd-badges">
+          <text class="badge">{{ book.status }}</text>
+          <text wx:if="{{ book.tag }}" class="badge">{{ book.tag }}</text>
+          <text wx:if="{{ book.readTime }}" class="badge">{{ book.readTime }}</text>
+        </view>
+        <view wx:if="{{ starStr }}" class="bd-stars">{{ starStr }}</view>
+      </view>
+    </view>
+
+    <!-- 读书笔记 -->
+    <view wx:if="{{ notes.length }}" class="bd-notes">
+      <view class="notes-title">{{ book.noteTitle || '读书笔记' }}</view>
+      <view wx:for="{{ notes }}" wx:key="index" class="note note--{{ item.kind }}">
+        <block wx:if="{{ item.kind === 'quote' }}">
+          <rich-text class="note-quote-text" nodes="{{ item.nodes }}"></rich-text>
+          <text wx:if="{{ item.source }}" class="bq-src">—— {{ item.source }}</text>
+        </block>
+        <block wx:else>
+          <rich-text class="note-comment-text" nodes="{{ item.nodes }}"></rich-text>
+        </block>
+      </view>
+    </view>
+
+    <empty-state
+      wx:elif="{{ book.noteAvailable === false || !notes.length }}"
+      type="empty"
+      text="这本还没有整理读书笔记"
+    />
+  </block>
+</view>

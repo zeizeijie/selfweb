@@ -1,0 +1,231 @@
+/* ===========================================================
+   个人知识花园 · 全局样式（app.wxss）
+   -----------------------------------------------------------
+   设计 token 由网站 site/styles.css 的 :root 映射而来（架构 §6.3 / §10.4）。
+   rpx 换算按 PRD §7.2（750rpx = 屏宽，1px ≈ 2rpx）。
+   =========================================================== */
+
+page {
+  /* ---- 颜色 ---- */
+  --bg: #ffffff;
+  --bg-alt: #f5f5f7;
+  --text: #1d1d1f;
+  --text-secondary: #6e6e73;
+  --text-tertiary: #86868b;
+  --line: rgba(0, 0, 0, 0.08);
+  --line-strong: rgba(0, 0, 0, 0.14);
+  --blue: #0071e3;
+  --blue-hover: #0077ed;
+  --star: #f5a623;
+  --success: #30d158;
+
+  /* ---- 模块色 ---- */
+  --c-ai: #0071e3;
+  --c-library: #bf4800;
+  --c-method: #6e56cf;
+  --c-travel: #0f8a6a;
+  --c-words: #c2405f;
+
+  /* ---- 圆角 ---- */
+  --radius-s: 24rpx;      /* 12px */
+  --radius-m: 36rpx;      /* 18px */
+  --radius-l: 56rpx;      /* 28px */
+  --radius-xl: 80rpx;     /* 40px */
+  --radius-pill: 999rpx;
+
+  /* ---- 间距 ---- */
+  --gap-page: 48rpx;      /* 24px 左右留白 */
+  --gap-card: 36rpx;
+  --sec-pad: 120rpx;      /* section 间距（移动端收紧值） */
+
+  /* ---- 阴影 ---- */
+  --shadow-s: 0 2rpx 4rpx rgba(0, 0, 0, .04), 0 8rpx 24rpx rgba(0, 0, 0, .04);
+  --shadow-m: 0 8rpx 48rpx rgba(0, 0, 0, .06), 0 24rpx 96rpx rgba(0, 0, 0, .05);
+
+  /* ---- 字号 ---- */
+  --fs-h1: 68rpx;
+  --fs-sec: 52rpx;
+  --fs-card: 42rpx;       /* card-title 21px */
+  --fs-body: 32rpx;       /* 16px */
+  --fs-meta: 26rpx;       /* 13px */
+
+  /* ---- 缓动 ---- */
+  --ease: cubic-bezier(0.28, 0.11, 0.32, 1);
+
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
+  letter-spacing: -0.01em;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------------- 页面通用容器 ---------------- */
+/* 全局盒模型：避免 padding 撑出横向滚动（375px 无横向滚动的关键） */
+view, scroll-view, text, image, button, input, textarea, navigator {
+  box-sizing: border-box;
+}
+
+.page-wrap {
+  width: 100%;
+  padding: 0 var(--gap-page);
+  box-sizing: border-box;
+}
+
+.card {
+  background: var(--bg-alt);
+  border-radius: var(--radius-l);
+  padding: 56rpx 56rpx 48rpx;
+}
+
+.card-title {
+  font-size: var(--fs-card);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.meta {
+  color: var(--text-tertiary);
+  font-size: var(--fs-meta);
+}
+
+.divider {
+  height: 1px;
+  background: var(--line);
+}
+
+/* ---------------- 排版 ---------------- */
+.h1 {
+  font-size: var(--fs-h1);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+
+.sec-title {
+  font-size: var(--fs-sec);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+}
+
+.eyebrow {
+  font-size: 24rpx;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.lead {
+  font-size: var(--fs-body);
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+/* ---------------- 区块 ---------------- */
+.section {
+  padding: var(--sec-pad) 0;
+}
+
+.section-tight {
+  padding: 88rpx 0;
+}
+
+/* ---------------- 芯片 ---------------- */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  background: var(--bg-alt);
+  border-radius: var(--radius-pill);
+  padding: 12rpx 28rpx;
+  line-height: 1.4;
+}
+
+.chip.active {
+  color: #fff;
+  background: var(--blue);
+}
+
+/* ---------------- 卡片网格 ---------------- */
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32rpx;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32rpx;
+}
+
+/* ---------------- 封面降级 ---------------- */
+.fallback-title {
+  color: #fff;
+  font-size: 34rpx;
+  font-weight: 600;
+  text-align: center;
+  padding: 32rpx;
+  letter-spacing: -0.01em;
+  line-height: 1.4;
+  text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, .28);
+}
+
+.img-broken {
+  opacity: 0;
+}
+
+/* ---------------- 星球评分 ---------------- */
+.stars {
+  color: var(--star);
+  font-size: 24rpx;
+  letter-spacing: 2rpx;
+}
+
+/* ---------------- 状态点 ---------------- */
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 12rpx;
+  font-size: 26rpx;
+  color: var(--text-secondary);
+}
+
+.status .sd {
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  background: var(--success);
+}
+
+/* ---------------- 加载骨架（加载态） ---------------- */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f2 25%, #e8e8ea 37%, #f0f0f2 63%);
+  background-size: 400% 100%;
+  animation: skeleton-loading 1.4s ease infinite;
+  border-radius: var(--radius-m);
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+
+/* ---------------- 通用分隔线组合 ---------------- */
+.list-item {
+  padding: 32rpx 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.list-item:last-child {
+  border-bottom: none;
+}

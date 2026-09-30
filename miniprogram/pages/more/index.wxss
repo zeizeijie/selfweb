@@ -1,0 +1,91 @@
+/* 更多页样式 */
+.page {
+  padding-bottom: 80rpx;
+}
+
+.head {
+  padding: 72rpx var(--gap-page) 32rpx;
+}
+.head-intro {
+  margin-top: 20rpx;
+}
+
+.entries {
+  padding: 0 var(--gap-page);
+}
+
+.entry {
+  display: flex;
+  align-items: center;
+  gap: 28rpx;
+  background: var(--bg-alt);
+  border-radius: var(--radius-l);
+  padding: 48rpx 44rpx;
+  margin-bottom: 32rpx;
+}
+.entry--hover {
+  opacity: 0.92;
+}
+.entry-ico {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 44rpx;
+  flex-shrink: 0;
+}
+.entry-body {
+  flex: 1;
+  min-width: 0;
+}
+.entry-name {
+  font-size: 40rpx;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.entry-tag {
+  margin-top: 8rpx;
+  font-size: 26rpx;
+  color: var(--text-tertiary);
+}
+.entry-right {
+  text-align: right;
+  flex-shrink: 0;
+}
+.entry-count {
+  font-size: 40rpx;
+  font-weight: 600;
+}
+.entry-unit {
+  margin-top: 4rpx;
+  font-size: 22rpx;
+  color: var(--text-tertiary);
+}
+
+.about {
+  padding: 32rpx var(--gap-page) 0;
+}
+.about-line {
+  height: 1px;
+  background: var(--line);
+  margin-bottom: 32rpx;
+}
+.about-name {
+  font-size: 32rpx;
+  font-weight: 600;
+}
+.about-sub {
+  margin-top: 12rpx;
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+.about-owner,
+.about-tag {
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  color: var(--text-tertiary);
+}

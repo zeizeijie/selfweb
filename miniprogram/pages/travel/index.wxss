@@ -1,0 +1,68 @@
+/* 旅行列表（对齐网站 .trip-card） */
+.page {
+  padding-bottom: 80rpx;
+}
+
+.head {
+  padding: 72rpx var(--gap-page) 24rpx;
+}
+.head-intro {
+  margin-top: 20rpx;
+}
+
+.list {
+  padding: 0 var(--gap-page);
+}
+
+.trip-card {
+  background: var(--bg-alt);
+  border-radius: var(--radius-l);
+  overflow: hidden;
+  margin-bottom: 40rpx;
+  box-shadow: var(--shadow-s);
+}
+.trip-card--hover {
+  opacity: 0.94;
+}
+
+.banner {
+  padding: 72rpx 44rpx 64rpx;
+  color: #fff;
+}
+.loc {
+  font-size: 26rpx;
+  opacity: 0.9;
+  letter-spacing: 0.02em;
+}
+.trip-title {
+  margin-top: 12rpx;
+  font-size: 48rpx;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.body {
+  padding: 36rpx 44rpx 44rpx;
+}
+.trip-sum {
+  font-size: 28rpx;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+.stats {
+  margin-top: 32rpx;
+  padding-top: 28rpx;
+  border-top: 1px solid var(--line);
+  display: flex;
+  gap: 64rpx;
+}
+.stat-v {
+  font-size: 32rpx;
+  font-weight: 600;
+}
+.stat-k {
+  margin-top: 6rpx;
+  font-size: 24rpx;
+  color: var(--text-tertiary);
+}

@@ -1,0 +1,44 @@
+<!-- 旅行列表：intro + 行程卡（渐变 banner） -->
+<view class="travel page">
+  <empty-state wx:if="{{ !ready }}" type="error" text="数据加载失败，请重进小程序" />
+
+  <block wx:else>
+    <view class="head">
+      <view class="eyebrow">TRAVEL</view>
+      <view class="h1">旅行</view>
+      <view wx:if="{{ intro }}" class="lead head-intro">{{ intro }}</view>
+    </view>
+
+    <empty-state wx:if="{{ trips.length === 0 }}" type="empty" text="还没有旅行记录" />
+
+    <view wx:else class="list">
+      <reveal wx:for="{{ trips }}" wx:key="id" delay="{{ index * 80 }}">
+        <view
+          class="trip-card"
+          data-id="{{ item.id }}"
+          bindtap="onTapTrip"
+          hover-class="trip-card--hover"
+          hover-stay-time="80"
+        >
+          <view class="banner" style="background: {{ item.cover }}">
+            <view class="loc">{{ item.location }}</view>
+            <view class="trip-title">{{ item.title }}</view>
+          </view>
+          <view class="body">
+            <view class="trip-sum">{{ item.summary }}</view>
+            <view class="stats">
+              <view class="stat">
+                <view class="stat-v">{{ item.date }}</view>
+                <view class="stat-k">时间</view>
+              </view>
+              <view class="stat">
+                <view class="stat-v">{{ item.altitude }}</view>
+                <view class="stat-k">关键信息</view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </reveal>
+    </view>
+  </block>
+</view>

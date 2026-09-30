@@ -1,0 +1,205 @@
+%% 个人知识花园 · 双端系统 类图 / 数据结构
+%% 来源：selfweb-architecture.md §4
+
+classDiagram
+  class SITE_DATA {
+    +Meta meta
+    +Module[] modules
+    +AiModule ai
+    +LibraryModule library
+    +MethodModule method
+    +TravelModule travel
+    +WordsModule words
+  }
+  class Meta {
+    +string name
+    +string subtitle
+    +string tagline
+    +string owner
+    +string shareImage
+  }
+  class Module {
+    +string id
+    +string name
+    +string icon
+    +string color
+    +string tagline
+    +string desc
+    +number count
+    +string shareImage
+  }
+  class AiModule {
+    +string intro
+    +AiProject[] projects
+  }
+  class AiProject {
+    +string id
+    +string title
+    +string status
+    +string summary
+    +string[] tags
+    +string color
+    +string[] highlights
+    +string shareImage
+  }
+  class LibraryModule {
+    +string intro
+    +Book[] books
+    +string[] favorites
+  }
+  class Book {
+    +string id
+    +string title
+    +string author
+    +number rating
+    +string status
+    +string tag
+    +string cover
+    +string coverFallback
+    +string readTime
+    +boolean noteAvailable
+    +string noteTitle
+    +Note[] note
+  }
+  class Note {
+    +string type
+    +string text
+    +string source
+  }
+  class MethodModule {
+    +string intro
+    +Category[] categories
+    +Article[] articles
+  }
+  class Category {
+    +string id
+    +string name
+  }
+  class Article {
+    +string id
+    +string title
+    +string category
+    +string summary
+    +string readingTime
+    +BodyNode[] body
+  }
+  class BodyNode {
+    +string h2
+    +string p
+    +string li
+    +string quote
+    +string source
+  }
+  class TravelModule {
+    +string intro
+    +Trip[] trips
+  }
+  class Trip {
+    +string id
+    +string title
+    +string location
+    +string date
+    +string altitude
+    +string cover
+    +string summary
+    +Section[] sections
+    +string[][] checklists
+    +string tip
+    +string shareImage
+  }
+  class Section {
+    +string icon
+    +string title
+    +string[] items
+  }
+  class WordsModule {
+    +string intro
+    +Category[] categories
+    +Word[] list
+  }
+  class Word {
+    +string id
+    +string text
+    +string author
+    +string source
+    +string category
+  }
+
+  SITE_DATA *-- Meta
+  SITE_DATA *-- "5" Module
+  SITE_DATA *-- AiModule
+  SITE_DATA *-- LibraryModule
+  SITE_DATA *-- MethodModule
+  SITE_DATA *-- TravelModule
+  SITE_DATA *-- WordsModule
+  AiModule *-- "n" AiProject
+  LibraryModule *-- "n" Book
+  Book *-- "n" Note
+  MethodModule *-- "n" Category
+  MethodModule *-- "n" Article
+  Article *-- "n" BodyNode
+  TravelModule *-- "n" Trip
+  Trip *-- "n" Section
+  WordsModule *-- "n" Category
+  WordsModule *-- "n" Word
+
+---
+
+classDiagram
+  class BuildPipeline {
+    +loadSource() Source
+    +normalize(Source) Contract
+    +validate(Contract) Report
+    +generateSite(Contract) string
+    +generateMini(Contract) string
+    +generateSeo(Contract) void
+    +run() void
+  }
+  class NotionClient {
+    +queryDatabase(id) Raw[]
+    +getBlocks(pageId) Raw[]
+    +prop(page, name) any
+    +mapToContract(raw) PartialContract
+  }
+  class MiniPage_Library {
+    +data: books, chips, filter
+    +onLoad()
+    +onShow()
+    +onChip(e)
+    +onTapBook(e)
+    +onShareAppMessage()
+  }
+  class MiniPage_BookDetail {
+    +data: book, notes
+    +onLoad(options)
+    +onShareAppMessage()
+  }
+  class Component_BookCard {
+    +properties: book
+    +data: coverOk
+    +onCoverError()
+    +onTap()
+  }
+  class Component_ChipBar {
+    +properties: items, active
+    +onPick(e)
+  }
+  class Util_Format {
+    +stars(n) string
+    +truncate(s,n) string
+    +richNodes(s) Node[]
+    +coverOf(entity) string
+  }
+  class Util_Store {
+    +getFilter(mod) string
+    +setFilter(mod,v) void
+    +findById(mod,id) entity
+  }
+
+  BuildPipeline ..> NotionClient : uses
+  MiniPage_Library ..> Util_Store : uses
+  MiniPage_Library ..> Component_ChipBar
+  MiniPage_Library ..> Component_BookCard
+  MiniPage_BookDetail ..> Util_Store : findById
+  MiniPage_BookDetail ..> Util_Format : richNodes
+  Component_BookCard ..> Util_Format : coverOf

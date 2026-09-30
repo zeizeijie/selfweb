@@ -1,0 +1,110 @@
+/* 文章详情样式（对齐网站 .article-body） */
+.page {
+  padding: 48rpx var(--gap-page) 112rpx;
+}
+
+/* ---------- 加载骨架 ---------- */
+.loading {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+.sk-line {
+  height: 40rpx;
+  border-radius: 20rpx;
+}
+
+/* ---------- 头部 ---------- */
+.a-head {
+  margin-bottom: 40rpx;
+}
+.cat-tag {
+  display: inline-block;
+  font-size: 24rpx;
+  color: var(--c-method);
+  background: rgba(110, 86, 207, .12);
+  border-radius: 999rpx;
+  padding: 8rpx 24rpx;
+}
+.a-title {
+  margin-top: 24rpx;
+  font-size: 54rpx;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.25;
+}
+.a-meta {
+  margin-top: 20rpx;
+  display: flex;
+  gap: 24rpx;
+  font-size: 26rpx;
+  color: var(--text-tertiary);
+}
+.a-from {
+  color: var(--text-tertiary);
+}
+.a-summary {
+  margin-top: 28rpx;
+  font-size: 32rpx;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  letter-spacing: -0.01em;
+}
+
+/* ---------- 正文 ---------- */
+.a-body {
+  margin-top: 24rpx;
+}
+
+.a-h2 {
+  margin: 48rpx 0 20rpx;
+  font-size: 40rpx;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.35;
+}
+
+.a-p {
+  display: block;
+  margin-bottom: 28rpx;
+  font-size: 32rpx;
+  line-height: 1.8;
+  color: #333336;
+}
+
+.a-li {
+  display: flex;
+  gap: 16rpx;
+  margin-bottom: 20rpx;
+}
+.bullet {
+  color: var(--c-method);
+  font-size: 32rpx;
+  line-height: 1.8;
+}
+.a-li-text {
+  flex: 1;
+  font-size: 31rpx;
+  line-height: 1.8;
+  color: #333336;
+}
+
+.a-quote {
+  margin: 32rpx 0;
+  padding: 28rpx 32rpx;
+  background: var(--bg-alt);
+  border-left: 6rpx solid var(--c-method);
+  border-radius: 0 var(--radius-m) var(--radius-m) 0;
+}
+.a-quote-text {
+  display: block;
+  font-size: 30rpx;
+  line-height: 1.75;
+  color: var(--text-secondary);
+}
+.bq-src {
+  display: block;
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  color: var(--text-tertiary);
+}

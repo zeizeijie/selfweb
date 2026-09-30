@@ -1,0 +1,19 @@
+/* 图书馆列表（对齐网站 2 列书墙） */
+.page {
+  padding-bottom: 80rpx;
+}
+
+.head {
+  padding: 72rpx var(--gap-page) 24rpx;
+}
+.head-intro {
+  margin-top: 20rpx;
+}
+
+.chips-wrap {
+  padding: 8rpx var(--gap-page) 32rpx;
+}
+
+.book-grid {
+  padding: 0 var(--gap-page);
+}

@@ -1,0 +1,99 @@
+%% 个人知识花园 · 双端系统 时序图
+%% 来源：selfweb-architecture.md §5
+
+%% ① 构建期 · Notion 同步与降级流程
+sequenceDiagram
+  autonumber
+  participant CI as 部署平台 (Vercel/Netlify)
+  participant B as build.js
+  participant NB as notion.js
+  participant N as Notion API
+  participant NM as normalize.js
+  participant GN as generate.js
+  participant FS as 文件系统
+
+  CI->>B: npm run build
+  B->>B: 读取 process.env.NOTION_TOKEN
+  alt Token 存在
+    B->>NB: fetchAll(token)
+    NB->>N: POST /v1/databases/{id}/query (Notion-Version 2022-06-28)
+    N-->>NB: 200 pages[]
+    loop 每个数据库
+      NB->>N: GET /v1/blocks/{pageId}/children
+      N-->>NB: blocks[]
+    end
+    NB-->>B: RawSource {ok:true}
+  else Token 缺失
+    B->>B: console.warn("未配置 NOTION_TOKEN，降级本地数据")
+  end
+
+  alt 源不可用 / 请求失败
+    B->>B: try 读取 data/site-data.local.json
+    alt 本地文件存在
+      B->>B: 使用本地源
+    else 本地缺失
+      B->>B: console.warn("使用内置兜底数据")
+    end
+  end
+
+  B->>NM: normalize(source)
+  NM->>NM: fixCover() / normalizeModules(count) / ensureIds()
+  NM->>NM: validate() -> {errors,warns}
+  NM-->>B: Contract
+  B->>GN: toSiteJs(contract)
+  GN-->>FS: 写 site/data.js
+  B->>GN: toMiniJs(contract)
+  GN-->>FS: 写 miniprogram/utils/data.js
+  B->>B: seo.generate() 注入 5 入口 HTML + robots + sitemap
+  Note over B,FS: 任一环节异常 -> catch，仅 warn，不 exit(1)
+  B-->>CI: exit 0（即使降级）
+
+---
+
+%% ② 小程序 · 列表 -> 筛选 -> 详情 -> 返回保留筛选态
+sequenceDiagram
+  autonumber
+  participant U as 用户
+  participant P as Page(library)
+  participant S as util/store
+  participant C as ChipBar / BookCard
+  participant D as Page(book-detail)
+
+  U->>P: 进入图书馆（tabBar）
+  P->>S: getFilter("library")
+  S-->>P: "all"（默认）或上次筛选
+  P->>P: setData({books: filter(list, f), chips})
+  U->>C: 点击芯片「在读」
+  C-->>P: onChip({detail:{value:"在读"}})
+  P->>S: setFilter("library","在读")
+  P->>P: setData 重新过滤 + 更新芯片计数
+  U->>C: 点击某本书书卡
+  C-->>P: onTapBook({detail:{id:"book-003"}})
+  P->>D: wx.navigateTo({url:"/pages/book-detail/index?id=book-003"})
+  D->>S: findById("library","book-003")
+  S-->>D: Book 实体
+  D->>D: setData({book, notes, coverOk:true})
+  U->>D: 点击左上返回 / 手势返回
+  D-->>P: navigateBack（Page 未被销毁）
+  Note over P: Page 实例仍在页面栈 -> data.filter 天然保留；Tab 场景由 store 缓存兜底
+  P-->>U: 列表 & 筛选态原样呈现
+
+---
+
+%% ③ 小程序 · 分享流程
+sequenceDiagram
+  autonumber
+  participant U as 用户
+  participant P as Page(book-detail)
+  participant W as 微信客户端
+  participant R as 好友
+
+  U->>P: 点击「···」-> 转发
+  P->>P: onShareAppMessage() 构造
+  P-->>W: {title: book.title, path:"/pages/book-detail/index?id="+id, imageUrl: book.shareImage || meta.shareImage}
+  W-->>U: 展示分享卡片预览
+  U->>W: 发送给好友
+  W-->>R: 好友收到卡片（标题=书名，图=分享图）
+  R->>W: 点击卡片
+  W->>P: 冷启动 page /pages/book-detail/index?id=book-003
+  P->>P: onLoad 读 options.id -> findById -> 渲染详情

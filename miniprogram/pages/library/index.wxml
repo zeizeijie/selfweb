@@ -1,0 +1,30 @@
+<!-- 图书馆列表：intro + 状态筛选芯片 + 2 列书籍网格 -->
+<view class="library page">
+  <empty-state wx:if="{{ !ready }}" type="error" text="数据加载失败，请重进小程序" />
+
+  <block wx:else>
+    <view class="head">
+      <view class="eyebrow">LIBRARY</view>
+      <view class="h1">图书馆</view>
+      <view wx:if="{{ intro }}" class="lead head-intro">{{ intro }}</view>
+    </view>
+
+    <view class="chips-wrap">
+      <chip-bar items="{{ chips }}" active="{{ filter }}" bind:pick="onChip" />
+    </view>
+
+    <empty-state
+      wx:if="{{ books.length === 0 }}"
+      type="empty"
+      text="这个状态下还没有书"
+      action-label="查看全部"
+      bind:action="onEmptyAction"
+    />
+
+    <view wx:else class="grid-2 book-grid">
+      <reveal wx:for="{{ books }}" wx:key="id" delay="{{ index * 40 }}">
+        <book-card book="{{ item }}" bind:tap="onTapBook" />
+      </reveal>
+    </view>
+  </block>
+</view>
