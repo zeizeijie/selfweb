@@ -1,8 +1,8 @@
 {
-  "name": "knowledge-garden",
+  "name": "zeizeijie",
   "version": "1.0.0",
   "private": true,
-  "description": "个人知识花园 · 双端（静态站 + 原生微信小程序）内容构建链",
+  "description": "贼贼接 · 双端（静态站 + 原生微信小程序）内容构建链",
   "type": "commonjs",
   "engines": { "node": ">=18" },
   "scripts": {

@@ -375,8 +375,8 @@ function validate(contract) {
  */
 const FALLBACK = {
   meta: {
-    name: "知识花园",
-    subtitle: "把散落在 Notion 里的思考，种成一片森林。",
+    name: "贼贼接",
+    subtitle: "把散落在 Notion 里的思考，整理成自己的知识库。",
     tagline: "AI 学习 · 图书馆 · 方法论 · 旅行 · Words",
     owner: "个人知识库",
     shareImage: ""

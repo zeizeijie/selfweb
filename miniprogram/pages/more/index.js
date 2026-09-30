@@ -63,7 +63,7 @@ Page({
   onShareAppMessage() {
     const meta = this.data.meta || {};
     return {
-      title: meta.name ? meta.name + " · 更多" : "知识花园",
+      title: meta.name ? meta.name + " · 更多" : "贼贼接",
       path: "/pages/more/index",
       imageUrl: SHARE_IMAGE
     };
@@ -72,7 +72,7 @@ Page({
   onShareTimeline() {
     const meta = this.data.meta || {};
     return {
-      title: meta.name ? meta.name + " · 更多" : "知识花园",
+      title: meta.name ? meta.name + " · 更多" : "贼贼接",
       imageUrl: SHARE_IMAGE
     };
   }

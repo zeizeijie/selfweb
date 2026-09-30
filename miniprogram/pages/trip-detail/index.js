@@ -66,7 +66,7 @@ Page({
   onShareAppMessage() {
     const t = this.data.trip;
     if (!t) {
-      return { title: "知识花园", path: "/pages/travel/index", imageUrl: SHARE_IMAGE };
+      return { title: "贼贼接", path: "/pages/travel/index", imageUrl: SHARE_IMAGE };
     }
     return {
       title: t.title + (t.location ? " · " + t.location : ""),

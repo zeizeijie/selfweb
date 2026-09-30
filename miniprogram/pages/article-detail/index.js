@@ -75,7 +75,7 @@ Page({
   onShareAppMessage() {
     const a = this.data.article;
     if (!a) {
-      return { title: "知识花园", path: "/pages/method/index", imageUrl: SHARE_IMAGE };
+      return { title: "贼贼接", path: "/pages/method/index", imageUrl: SHARE_IMAGE };
     }
     return {
       title: a.title,

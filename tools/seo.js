@@ -47,8 +47,8 @@ function seoFor(contract, mod) {
   const meta = contract.meta || {};
   if (mod === "home") {
     return {
-      title: (meta.name || "知识花园") + " · 个人知识站",
-      description: meta.subtitle || meta.tagline || "个人知识花园",
+      title: (meta.name || "贼贼接") + " · 个人知识站",
+      description: meta.subtitle || meta.tagline || "个人知识站",
       shareImage: meta.shareImage || "",
       path: "index.html",
       view: ""
@@ -59,7 +59,7 @@ function seoFor(contract, mod) {
   const tagline = m.tagline || "";
   const desc = m.desc || tagline;
   return {
-    title: name + " · " + (meta.name || "知识花园"),
+    title: name + " · " + (meta.name || "贼贼接"),
     description: desc,
     shareImage: m.shareImage || meta.shareImage || "",
     path: (MODULE_SEO[mod] || { path: mod + ".html" }).path,
@@ -82,7 +82,7 @@ function buildHeadFragment(info, siteUrl) {
     '<meta name="description" content="' + esc(info.description) + '">',
     '<link rel="canonical" href="' + esc(url) + '">',
     '<meta property="og:type" content="website">',
-    '<meta property="og:site_name" content="知识花园">',
+    '<meta property="og:site_name" content="贼贼接">',
     '<meta property="og:title" content="' + esc(info.title) + '">',
     '<meta property="og:description" content="' + esc(info.description) + '">',
     '<meta property="og:url" content="' + esc(url) + '">',
@@ -201,8 +201,8 @@ function buildSitemap(contract, siteUrl) {
 function buildManifest(contract) {
   const meta = contract.meta || {};
   return JSON.stringify({
-    name: meta.name || "知识花园",
-    short_name: meta.name || "知识花园",
+    name: meta.name || "贼贼接",
+    short_name: meta.name || "贼贼接",
     description: meta.subtitle || meta.tagline || "",
     start_url: "./",
     display: "standalone",
@@ -223,7 +223,7 @@ function buildManifest(contract) {
  */
 function build404(contract) {
   const meta = contract.meta || {};
-  const name = esc(meta.name || "知识花园");
+  const name = esc(meta.name || "贼贼接");
   return [
     "<!DOCTYPE html>",
     '<html lang="zh-CN">',
@@ -248,7 +248,7 @@ function build404(contract) {
     '<div class="wrap">',
     '<div class="code">404</div>',
     "<h1>这一步走到了空白页</h1>",
-    "<p>你要找的页面不存在，或者链接已经失效。<br>不如回花园里逛逛？</p>",
+    "<p>你要找的页面不存在，或者链接已经失效。<br>不如回首页逛逛？</p>",
     '<a class="btn" href="/">返回首页 →</a>',
     "</div>",
     "</body>",

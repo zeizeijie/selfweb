@@ -1,4 +1,4 @@
-# 个人知识花园 · 双端系统架构设计与任务分解
+# 贼贼接 · 双端系统架构设计与任务分解
 
 | 项 | 内容 |
 | --- | --- |
@@ -708,7 +708,7 @@ sequenceDiagram
   "window": {
     "navigationBarBackgroundColor": "#ffffff",
     "navigationBarTextStyle": "black",
-    "navigationBarTitleText": "知识花园",
+    "navigationBarTitleText": "贼贼接",
     "backgroundColor": "#f5f5f7",
     "backgroundTextStyle": "dark",
     "enablePullDownRefresh": false
@@ -1030,7 +1030,7 @@ graph LR
 
 ```jsonc
 {
-  "name": "knowledge-garden",
+  "name": "zeizeijie",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -1131,7 +1131,7 @@ graph LR
 | 编号 | 问题（对应 PRD §10） | 架构建议默认值 | 若用户改动的影响面 |
 | --- | --- | --- | --- |
 | Q1 | 小程序 AppID | 先用「测试号」，`project.config.json` 留 `appid` 占位 | 仅改 1 行配置 |
-| Q2 | 小程序名称与简介 | 沿用「知识花园」 | `app.json` 标题 + 分享标题 |
+| Q2 | 小程序名称与简介 | 沿用「贼贼接」 | `app.json` 标题 + 分享标题 |
 | Q3 | 订阅消息 | **默认不做** | 不实现即无影响 |
 | Q4 | 网站域名 | 用 `SITE_URL` 环境变量，默认 Vercel 默认域 | 构建时注入，无需改代码 |
 | Q5 | Notion Token / 数据源 | **先交付降级版**，Token 后补 | T02 已按三级降级设计，Token 到位即自动启用 |

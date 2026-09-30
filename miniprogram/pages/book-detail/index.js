@@ -73,7 +73,7 @@ Page({
   onShareAppMessage() {
     const b = this.data.book;
     if (!b) {
-      return { title: "知识花园", path: "/pages/library/index", imageUrl: SHARE_IMAGE };
+      return { title: "贼贼接", path: "/pages/library/index", imageUrl: SHARE_IMAGE };
     }
     return {
       title: b.title + (b.author ? " · " + b.author : ""),

@@ -114,7 +114,7 @@ Page({
   onShareAppMessage() {
     const meta = this.data.meta || {};
     return {
-      title: meta.name ? meta.name + " · " + (meta.tagline || "") : "知识花园",
+      title: meta.name ? meta.name + " · " + (meta.tagline || "") : "贼贼接",
       path: "/pages/index/index",
       imageUrl: SHARE_IMAGE
     };
@@ -124,7 +124,7 @@ Page({
   onShareTimeline() {
     const meta = this.data.meta || {};
     return {
-      title: meta.name ? meta.name + " · " + (meta.tagline || "") : "知识花园",
+      title: meta.name ? meta.name + " · " + (meta.tagline || "") : "贼贼接",
       imageUrl: SHARE_IMAGE
     };
   }

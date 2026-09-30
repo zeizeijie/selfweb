@@ -166,7 +166,7 @@ async function run(argv) {
   const args = parseArgs(argv || process.argv.slice(2));
   const siteUrl = resolveSiteUrl(args);
   log("============================================================");
-  log("知识花园 · 双端构建开始");
+  log("贼贼接 · 双端构建开始");
   log("site-url = " + siteUrl + (args.noNotion ? "  (--no-notion)" : ""));
   log("============================================================");
 

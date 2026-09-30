@@ -1,4 +1,4 @@
-# 个人知识花园 · 增量 PRD（网站可部署化 + 原生微信小程序）
+# 贼贼接 · 增量 PRD（网站可部署化 + 原生微信小程序）
 
 | 项 | 内容 |
 | --- | --- |
@@ -413,7 +413,7 @@ page {
 | --- | --- |
 | `navigationBarBackgroundColor` | `#ffffff` |
 | `navigationBarTextStyle` | `black` |
-| `navigationBarTitleText` | 各页对应模块名（首页 = 站点名「知识花园」） |
+| `navigationBarTitleText` | 各页对应模块名（首页 = 站点名「贼贼接」） |
 | `backgroundColor`（下拉背景） | `#f5f5f7` |
 | `backgroundTextStyle` | `dark` |
 
@@ -495,7 +495,7 @@ page {
 | 编号 | 问题 | 影响 | 建议默认 |
 | --- | --- | --- | --- |
 | Q1 | 小程序 **AppID** 是否已有？ | 无法真机预览/发布 | 先用「测试号」跑通，正式 AppID 后补 |
-| Q2 | 小程序 **名称**与简介 | tabBar 首页标题、分享卡片 | 沿用「知识花园」 |
+| Q2 | 小程序 **名称**与简介 | tabBar 首页标题、分享卡片 | 沿用「贼贼接」 |
 | Q3 | 是否需要**订阅消息 / 内容更新提醒** | 决定 R-20 是否做 | 默认不做 |
 | Q4 | 网站**部署域名** | 影响 SEO 绝对 URL、OG 卡片 | 先用 Vercel 默认域名 |
 | Q5 | **Notion Token** 何时提供？对应数据库 ID 是否已建好 5 个数据源？ | 决定 R-02 是否能真实跑通 | 先交付降级版；Token 后补 |

@@ -1,5 +1,5 @@
 {
-  "description": "个人知识花园 · 原生微信小程序（零 npm 依赖，导入微信开发者工具即用）",
+  "description": "贼贼接 · 原生微信小程序（零 npm 依赖，导入微信开发者工具即用）",
   "packOptions": {
     "ignore": [
       { "type": "file", "value": "utils/data.js.map" }
@@ -47,7 +47,7 @@
   "compileType": "miniprogram",
   "libVersion": "3.5.5",
   "appid": "touristappid",
-  "projectname": "knowledge-garden",
+  "projectname": "zeizeijie",
   "condition": {},
   "miniprogramRoot": "./"
 }

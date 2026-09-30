@@ -10,7 +10,7 @@
   <block wx:else>
     <!-- Hero -->
     <view class="hero">
-      <view class="eyebrow">PERSONAL KNOWLEDGE GARDEN</view>
+      <view class="eyebrow">ZEI ZEI JIE</view>
       <view class="h1 hero-title">{{ meta.name }}</view>
       <view class="lead hero-sub">{{ meta.subtitle }}</view>
       <view class="hero-tag">{{ meta.tagline }}</view>
