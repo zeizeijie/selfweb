@@ -131,22 +131,40 @@ function makeId(prefix, index) {
 
 /**
  * 缺陷①：封面清理。
- * 无效（空 / attachment: 开头 / 非 http(s)）一律清空为 ""，
+ * 无效（空 / attachment: 开头 / 非 http(s)）一律清空为 ""；
+ * 另有一类「会过期」的封面必须同等对待：Notion 上传的文件返回的是带签名的
+ * S3 临时链接（含 X-Amz-Expires，默认 1 小时失效），构建后线上必然破图，
+ * 因此同样降级为渐变（把静态 CDN 直链留给用户自行填入）。
  * 并确保存在 coverFallback（缺省补默认渐变）。
- * 注意：仅在「无效」时清空，有效 http(s) 封面原样保留。
  * @param {object} book 书籍对象（原地修改）
  * @returns {object} 处理后的书籍
  */
 function fixCover(book) {
   const c = str(book.cover).trim();
-  if (!c || INVALID_COVER.test(c) || !HTTP_URL.test(c)) {
-    if (c) warn('[cover] "' + str(book.title) + '" 封面无效（' + c + '），已降级为渐变');
+  const expired = isExpiringUrl(c);
+  if (!c || INVALID_COVER.test(c) || !HTTP_URL.test(c) || expired) {
+    if (c) {
+      warn('[cover] "' + str(book.title) + '" 封面' +
+        (expired ? '为会过期的签名链接（Notion 临时文件），' : '无效（' + c + '），') +
+        '已降级为渐变');
+    }
     book.cover = "";
     if (!str(book.coverFallback).trim()) {
       book.coverFallback = DEFAULTS.coverFallback;
     }
   }
   return book;
+}
+
+/**
+ * 判断 URL 是否为「会过期」的临时签名链接。
+ * 覆盖 AWS S3 预签名、Notion 文件代理等场景。
+ * @param {string} url
+ * @returns {boolean}
+ */
+function isExpiringUrl(url) {
+  if (!url) return false;
+  return /X-Amz-Expires=|X-Amz-Signature=|X-Amz-Credential=|secure\.notion-static\.com|prod-files-secure\.s3\./i.test(url);
 }
 
 /**
@@ -487,6 +505,7 @@ module.exports = {
   normalizeModules: normalizeModules,
   ensureIds: ensureIds,
   fixCover: fixCover,
+  isExpiringUrl: isExpiringUrl,
   validate: validate,
   makeId: makeId,
   // 常量

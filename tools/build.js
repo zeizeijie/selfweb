@@ -35,6 +35,30 @@ const MINI_UTILS = path.join(ROOT, "miniprogram", "utils");
 function log(msg) { console.log(msg); }
 function warn(msg) { console.warn("[warn] " + msg); }
 
+/**
+ * 零依赖加载 .env 文件（Node 默认不会自动读取）。
+ * 规则：已存在于 process.env 的变量不覆盖（便于 CI / 命令行显式注入优先）；
+ *      支持 KEY=VALUE、# 注释、值两侧引号。
+ * @param {string} file 绝对路径
+ */
+function loadDotEnv(file) {
+  if (!fs.existsSync(file)) return false;
+  const text = fs.readFileSync(file, "utf8");
+  text.split(/\r?\n/).forEach(function (line) {
+    const s = line.trim();
+    if (!s || s.charAt(0) === "#") return;
+    const eq = s.indexOf("=");
+    if (eq < 1) return;
+    const key = s.slice(0, eq).trim();
+    let val = s.slice(eq + 1).trim();
+    if ((val.charAt(0) === '"' && val.slice(-1) === '"') || (val.charAt(0) === "'" && val.slice(-1) === "'")) {
+      val = val.slice(1, -1);
+    }
+    if (key && !(key in process.env)) process.env[key] = val;
+  });
+  return true;
+}
+
 /** 解析命令行参数 */
 function parseArgs(argv) {
   const args = { noNotion: false, siteUrl: "" };
@@ -79,6 +103,56 @@ function copyDir(src, dest) {
 
 /* ---------------- 三级降级链 ---------------- */
 
+/** 模块 → 各自的列表字段名（来自 normalize 的 ID_FIELD 约定，此处显式列出便于阅读） */
+const MODULE_LIST_KEY = {
+  ai: "projects",
+  library: "books",
+  method: "articles",
+  travel: "trips",
+  words: "list"
+};
+
+/**
+ * 模块级合并：把 notion 结果中失败的模块，用本地数据逐模块补齐。
+ * 这样单个模块同步失败不会拖垮其余模块（模块级降级粒度）。
+ * @param {object} notionData Notion 拉取的契约（可能部分模块为空）
+ * @param {string[]} failedMods 同步失败的模块 id 列表
+ * @param {object} localData 本地契约数据
+ * @returns {{merged:object, patched:string[]}} 合并结果与被补齐的模块
+ */
+function mergeByModule(notionData, failedMods, localData) {
+  const patched = [];
+  const merged = JSON.parse(JSON.stringify(notionData));
+
+  failedMods.forEach(function (mod) {
+    const key = MODULE_LIST_KEY[mod];
+    if (!key) return false;
+    const localSection = localData && localData[mod];
+    const localList = localSection && localSection[key];
+    if (!Array.isArray(localList) || !localList.length) return; // 本地也没有 → 保持空
+    merged[mod] = JSON.parse(JSON.stringify(localSection));
+    patched.push(mod);
+  });
+
+  // 模块导航的 count 需要跟随实际列表长度重算（normalize 也会校正，这里提前同步）
+  (merged.modules || []).forEach(function (m) {
+    const key = MODULE_LIST_KEY[m.id];
+    if (key && merged[m.id] && Array.isArray(merged[m.id][key])) {
+      m.count = merged[m.id][key].length;
+    }
+  });
+
+  // 本地与 Notion 都缺失的模块，补上模块导航项，避免导航缺项
+  (localData && localData.modules || []).forEach(function (lm) {
+    if (!(merged.modules || []).some(function (m) { return m.id === lm.id; })) {
+      merged.modules = merged.modules || [];
+      merged.modules.push(JSON.parse(JSON.stringify(lm)));
+    }
+  });
+
+  return { merged: merged, patched: patched };
+}
+
 /**
  * 按三级降级链获取原始源。
  * @param {object} args 参数
@@ -93,8 +167,23 @@ async function loadSource(args) {
       log("[source] 检测到 NOTION_TOKEN，尝试从 Notion 同步…");
       const notion = require("./notion");
       const res = await notion.fetchAll({ token: token, log: log });
+      const failed = res.failed || [];
+
+      // 模块级降级：失败模块回填本地数据
+      if (failed.length) {
+        let local = null;
+        try { local = readLocalSource(); } catch (e) { /* 本地缺失则不补齐 */ }
+        if (local) {
+          const r = mergeByModule(res.data, failed, local);
+          warn("[source] ① 模块级降级：[" + failed.join(", ") + "] 同步失败，已回填本地数据" +
+            (r.patched.length ? "（成功回填：" + r.patched.join(", ") + "）" : "（本地亦无数据）"));
+          log("[source] ① Notion 部分同步成功（" + Object.keys(res.counts).map(function (k) { return k + "=" + (failed.indexOf(k) >= 0 ? "本地" : res.counts[k]); }).join(" / ") + "）");
+          return { source: r.merged, level: 1, label: "Notion API + 本地回填", counts: countOf(r.merged), failed: failed };
+        }
+      }
+
       log("[source] ① Notion 同步成功（" + Object.keys(res.counts).map(function (k) { return k + "=" + res.counts[k]; }).join(" / ") + "）");
-      return { source: res.data, level: 1, label: "Notion API", counts: res.counts };
+      return { source: res.data, level: 1, label: "Notion API", counts: res.counts, failed: failed };
     } catch (e) {
       warn("[source] ① Notion 同步失败：" + e.message + "，降级本地数据");
     }
@@ -163,6 +252,7 @@ function copySiteToDist() {
  */
 async function run(argv) {
   const t0 = Date.now();
+  loadDotEnv(path.join(ROOT, ".env"));
   const args = parseArgs(argv || process.argv.slice(2));
   const siteUrl = resolveSiteUrl(args);
   log("============================================================");

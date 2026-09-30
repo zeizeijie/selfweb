@@ -16,6 +16,7 @@
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
+const normalizeMod = require("./normalize");
 
 const ROOT = path.join(__dirname, "..");
 const SITE_DATA = path.join(ROOT, "site", "data.js");
@@ -67,7 +68,7 @@ function main() {
   const fpMini = JSON.stringify(mini);
   check("双端数据逐字节同构", fpSite === fpMini);
 
-  // 3) 条数
+  // 3) 条数自洽性（不写死具体数字：数据源可能是 Notion / 本地 / 回填混合）
   const counts = {
     ai: site.ai.projects.length,
     library: site.library.books.length,
@@ -75,11 +76,11 @@ function main() {
     travel: site.travel.trips.length,
     words: site.words.list.length
   };
-  check("条数：ai=3", counts.ai === 3, "实际 " + counts.ai);
-  check("条数：library=12", counts.library === 12, "实际 " + counts.library);
-  check("条数：method=7", counts.method === 7, "实际 " + counts.method);
-  check("条数：travel=3", counts.travel === 3, "实际 " + counts.travel);
-  check("条数：words=74", counts.words === 74, "实际 " + counts.words);
+  Object.keys(counts).forEach(function (m) {
+    check("条数：" + m + " ≥ 1 且为整数", Number.isInteger(counts[m]) && counts[m] >= 1, "实际 " + counts[m]);
+  });
+  check("条数：各模块均非空", Object.keys(counts).every(function (m) { return counts[m] > 0; }),
+    JSON.stringify(counts));
 
   // 4) count 校正
   const countOk = site.modules.every(function (m) {
@@ -88,13 +89,24 @@ function main() {
   });
   check("modules[].count = 真实 list.length", countOk);
 
-  // 5) 破图 / attachment
+  // 5) 破图 / attachment / 过期签名链接
   const noAttachment = !fs.readFileSync(SITE_DATA, "utf8").match(/attachment:/i);
   check("无 attachment: 前缀", noAttachment);
   const coverOk = site.library.books.every(function (b) { return b.cover === "" || /^https?:\/\//i.test(b.cover); });
   check("书籍封面：空串或 http(s)", coverOk);
-  const mingChao = site.library.books.filter(function (b) { return b.title === "明朝那些事"; })[0];
-  check("《明朝那些事》cover === ''", !!mingChao && mingChao.cover === "");
+
+  // 会过期的签名 URL 一律不得出现在产物中（否则构建后 1 小时必然破图）
+  const expiring = [];
+  (site.library.books || []).forEach(function (b) {
+    if (b.cover && normalizeMod.isExpiringUrl && normalizeMod.isExpiringUrl(b.cover)) expiring.push("book:" + b.title);
+  });
+  check("无会过期的签名封面 URL", expiring.length === 0, expiring.join(", "));
+
+  // 所有空封面的书都必须有 coverFallback 渐变兜底
+  const fallbackOk = site.library.books.every(function (b) {
+    return b.cover !== "" || (typeof b.coverFallback === "string" && b.coverFallback.indexOf("gradient") >= 0);
+  });
+  check("空封面均有 coverFallback 渐变", fallbackOk);
 
   // 6) id 唯一
   const allIds = [];

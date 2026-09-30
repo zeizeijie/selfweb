@@ -1,47 +1,72 @@
 {
-  "_comment": "Notion 数据源 / 属性名 → 契约字段 映射表。无需改代码即可调整同步映射。数据源 ID 需与 NOTION_TOKEN 授权的集成可访问。",
+  "_comment": "Notion 数据源 / 属性名 → 契约字段 映射表。dataSourceId 必须是 database_id（可由 POST /v1/search 获取）；type=\"page\" 表示该模块是页面下的子页面集合，读 pageId。字段 type 支持：title / rich_text / rich_text_lines / number / select / status / multi_select / stars / date / files_or_url / relation / title_const。",
   "notionVersion": "2022-06-28",
   "apiBase": "https://api.notion.com/v1",
   "sources": {
     "ai": {
       "label": "AI 学习",
-      "dataSourceId": "3ebf5433-9d28-806d-a0ef-c098b1fbe8d5",
-      "pageId": "",
+      "type": "page",
+      "dataSourceId": "",
+      "pageId": "3ebf5433-9d28-806d-a0ef-c098b1fbe8d5",
       "listKey": "projects",
       "fields": {
         "title": { "prop": "名称", "type": "title" },
-        "status": { "prop": "状态", "type": "select", "map": { "进行中": "进行中", "已完成": "已完成" }, "default": "进行中" },
-        "summary": { "prop": "简介", "type": "rich_text", "default": "" },
-        "tags": { "prop": "标签", "type": "multi_select", "default": [] },
-        "color": { "prop": "主色", "type": "rich_text", "default": "#0071e3" },
-        "highlights": { "prop": "亮点", "type": "rich_text_lines", "default": [] }
+        "status": {
+          "prop": "名称",
+          "type": "title_const",
+          "table": {
+            "个人网站": "进行中",
+            "抖音实时字幕": "已完成",
+            "聚餐小程序": "进行中",
+            "拉了么小程序": "进行中"
+          },
+          "default": "进行中"
+        },
+        "summary": { "prop": "名称", "type": "rich_text", "default": "" },
+        "tags": { "prop": "名称", "type": "rich_text_lines", "default": [] },
+        "color": { "prop": "名称", "type": "rich_text", "default": "#0071e3" },
+        "highlights": { "prop": "名称", "type": "rich_text_lines", "default": [] }
       }
     },
     "library": {
       "label": "图书馆",
-      "dataSourceId": "1a0f5433-9d28-8109-a4ed-000b8f65f460",
-      "pageId": "1a0f5433-9d28-80db-bb81-c6683281bed0",
+      "dataSourceId": "1a0f5433-9d28-8139-bfce-e3b9ba76ce25",
+      "pageId": "",
       "listKey": "books",
       "fields": {
         "title": { "prop": "书名", "type": "title" },
-        "author": { "prop": "作者", "type": "rich_text", "default": "" },
-        "rating": { "prop": "评分", "type": "number", "default": 0 },
-        "status": { "prop": "状态", "type": "select", "map": { "已读": "已读", "在读": "在读", "想读": "想读" }, "default": "想读" },
-        "tag": { "prop": "标签", "type": "select", "default": "" },
+        "author": { "prop": "作者", "type": "relation", "separator": "、", "default": "" },
+        "rating": { "prop": "评分", "type": "stars", "default": 0 },
+        "status": {
+          "prop": "阅读状态",
+          "type": "status",
+          "map": { "已读": "已读", "在读": "在读", "想读": "想读" },
+          "default": "想读"
+        },
+        "tag": { "prop": "标签", "type": "multi_select", "default": "" },
         "cover": { "prop": "封面", "type": "files_or_url", "default": "" },
-        "readTime": { "prop": "阅读时间", "type": "rich_text", "default": "" },
-        "noteTitle": { "prop": "笔记标题", "type": "rich_text", "default": "读书笔记" }
-      },
-      "childrenBlocks": { "prop": "笔记", "target": "note" }
+        "readTime": { "prop": "阅读时间", "type": "date", "default": "" },
+        "noteTitle": { "prop": "备注", "type": "rich_text", "default": "读书笔记" }
+      }
     },
     "method": {
       "label": "方法论",
-      "dataSourceId": "1a3f5433-9d28-80f6-8545-000bf3345e20",
-      "pageId": "1a3f5433-9d28-8009-9689-d01fdd5c0af3",
+      "dataSourceId": "1a3f5433-9d28-8009-9689-d01fdd5c0af3",
+      "pageId": "",
       "listKey": "articles",
       "fields": {
         "title": { "prop": "名称", "type": "title" },
-        "category": { "prop": "知识类型", "type": "select", "map": { "学习方法": "learn", "理论知识": "theory", "项目管理": "project", "为人处事": "life" }, "default": "learn" },
+        "category": {
+          "prop": "知识类型",
+          "type": "select",
+          "map": {
+            "学习方法": "learn",
+            "理论知识": "theory",
+            "项目管理": "project",
+            "为人处事": "life"
+          },
+          "default": "learn"
+        },
         "summary": { "prop": "摘要", "type": "rich_text", "default": "" },
         "readingTime": { "prop": "阅读时长", "type": "rich_text", "default": "" }
       },
@@ -49,8 +74,8 @@
     },
     "travel": {
       "label": "旅行",
-      "dataSourceId": "3eaf5433-9d28-80d7-9ed5-000baa8ffbef",
-      "pageId": "3eaf5433-9d28-8075-823b-e1f56aebe809",
+      "dataSourceId": "3eaf5433-9d28-8075-823b-e1f56aebe809",
+      "pageId": "",
       "listKey": "trips",
       "fields": {
         "title": { "prop": "名称", "type": "title" },
@@ -65,12 +90,22 @@
     },
     "words": {
       "label": "Words",
-      "dataSourceId": "1a3f5433-9d28-80d4-a9b8-000b674a3500",
-      "pageId": "1a3f5433-9d28-8000-917f-de1d1a98f332",
+      "dataSourceId": "1a3f5433-9d28-8000-917f-de1d1a98f332",
+      "pageId": "",
       "listKey": "list",
       "fields": {
         "text": { "prop": "内容", "type": "title" },
-        "category": { "prop": "分类", "type": "select", "map": { "人生感悟": "人生感悟", "休闲文案": "休闲文案", "为人处事": "为人处事", "装X语录": "装X语录" }, "default": "人生感悟" },
+        "category": {
+          "prop": "分类",
+          "type": "select",
+          "map": {
+            "人生感悟": "人生感悟",
+            "休闲文案": "休闲文案",
+            "为人处事": "为人处事",
+            "装X语录": "装X语录"
+          },
+          "default": "人生感悟"
+        },
         "source": { "prop": "出处", "type": "rich_text", "default": "" },
         "author": { "prop": "作者", "type": "rich_text", "default": "" },
         "date": { "prop": "日期", "type": "date", "default": "" },

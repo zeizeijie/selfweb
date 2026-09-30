@@ -181,17 +181,18 @@ function findById(mod, id) {
   for (let i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
   return null;
 }
+// 取样 id 从契约动态取（Notion 同步下 id 是 page id，本地是 book-001 形态）
 const samples = [
-  ["library", "book-001"],
-  ["method", "article-001"],
-  ["travel", "trip-001"]
+  ["library", ((DATA.library.books || [])[0] || {}).id],
+  ["method", ((DATA.method.articles || [])[0] || {}).id],
+  ["travel", ((DATA.travel.trips || [])[0] || {}).id]
 ];
 samples.forEach(function (s) {
-  const hit = findById(s[0], s[1]);
+  const hit = s[1] ? findById(s[0], s[1]) : null;
   if (hit) pass("findById(" + s[0] + "," + s[1] + ") → " + hit.title);
   else fail("findById 应命中: " + s[0] + " " + s[1]);
 });
-[["library", "book-999"], ["method", "article-999"], ["travel", "trip-999"]].forEach(function (s) {
+[["library", "book-999-does-not-exist"], ["method", "article-999-does-not-exist"], ["travel", "trip-999-does-not-exist"]].forEach(function (s) {
   const hit = findById(s[0], s[1]);
   if (!hit) pass("findById 未命中（→错误态）: " + s[0] + " " + s[1]);
   else fail("findById 不应命中: " + s[0] + " " + s[1]);

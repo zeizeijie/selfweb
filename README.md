@@ -72,11 +72,39 @@ node tools/build.js
 
 ### 方式二：接入 Notion 自动同步
 
-1. 复制 `.env.example` 为 `.env`，填入 Notion Integration Token
-2. 在 `data/notion-map.json` 中确认各模块的数据源 ID
-3. 重新构建即可拉取最新内容
+1. 在 [notion.so/my-integrations](https://www.notion.so/my-integrations) 新建集成，复制 Internal Integration Secret
+2. **关键一步**：在 Notion 中把目标页面/数据库「连接」（Share → 找到你的集成）到该集成，否则 API 会返回 404
+3. 复制 `.env.example` 为 `.env`，填入 `NOTION_TOKEN`（`build.js` 会自动加载 `.env`，无需额外依赖）
+4. 在 `data/notion-map.json` 中确认各模块的 `dataSourceId`
+5. 重新构建即可拉取最新内容
 
-**降级策略**：即使没有 Token 或 Notion 请求失败，构建依然成功，自动回退到本地数据 —— 不会中断部署。
+**如何获取正确的数据源 ID**：
+
+- `dataSourceId` 必须是 **database_id**（形如 `1a0f5433-9d28-8009-9689-d01fdd5c0af3`），**不是** `collection://...` 或页面 ID
+- 可用 `POST https://api.notion.com/v1/search`（带 `filter: {property:"object", value:"database"}`）列出集成可见的全部数据库
+- 若某个模块是「页面下的子页面集合」而非数据库，在该模块配置 `"type": "page"` 并填 `pageId`
+
+**降级策略（三级 + 模块级）**：
+
+| 层级 | 触发条件 | 行为 |
+| --- | --- | --- |
+| ① | `NOTION_TOKEN` 存在且请求成功 | 使用 Notion 数据 |
+| ①′ | **部分模块**同步失败 | 失败模块**单独**回填本地数据，其余模块继续用 Notion（模块级降级） |
+| ② | 无 Token / 整体请求失败 | 全部回退 `data/site-data.local.json` |
+| ③ | 本地数据也缺失 | 使用内置兜底数据 |
+
+任何情况下 **构建都不会失败**，不会中断部署。
+
+**字段类型支持**（`notion-map.json` 的 `fields[].type`）：
+
+`title` / `rich_text` / `rich_text_lines` / `number` / `select` / `status` / `multi_select` / `stars` / `date` / `files_or_url` / `relation` / `title_const`
+
+- `status`：Notion 新版 status 属性（值取 `status.name`）
+- `stars`：`multi_select` 里的 ⭐ 符号转为 0~5 数字
+- `relation`：自动二次查询关联页面取标题（如书籍的「作者」关联）
+- `title_const`：按标题查表赋值，用于「页面型数据源」缺失字段时手工指定
+
+**已知限制**：Notion 上传的图片会返回带签名的 **S3 临时链接（1 小时过期）**，构建脚本会识别并自动降级为渐变背景，避免线上破图。如需真实封面，请在 Notion 中改用外部图片直链（如豆瓣 CDN）。
 
 ### 部署
 

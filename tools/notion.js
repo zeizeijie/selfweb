@@ -54,6 +54,24 @@ function richText(rt) {
 }
 
 /**
+ * 带格式的富文本：把 Notion 的 annotations.bold 还原为 Markdown 的 **粗体** 标记。
+ * 仅用于正文 / 笔记类内容（模板与小程序都支持解析 ** 标记）；
+ * 标题、作者等纯文本字段请继续使用 richText，避免污染。
+ * @param {Array} rt rich_text 数组
+ * @returns {string}
+ */
+function richTextMarked(rt) {
+  if (!Array.isArray(rt)) return "";
+  return rt.map(function (t) {
+    if (!t) return "";
+    const txt = (t.plain_text || "");
+    if (!txt) return "";
+    if (t.annotations && t.annotations.bold) return "**" + txt + "**";
+    return txt;
+  }).join("");
+}
+
+/**
  * 按映射描述从 page 中取值并转换为契约字段。
  * @param {object} page Notion page
  * @param {object} desc 映射描述 { prop, type, map?, default? }
@@ -98,6 +116,35 @@ function readField(page, desc) {
     }
     case "files_or_url": {
       value = extractFileUrl(raw);
+      break;
+    }
+    case "status": {
+      // Notion 新版 status 类型：值形如 { id, name, color }
+      const name = raw.status && raw.status.name;
+      value = mapValue(name, desc, def);
+      break;
+    }
+    case "stars": {
+      // multi_select 存储 ⭐ 符号，转为 0~5 数字
+      const names = Array.isArray(raw.multi_select) ? raw.multi_select.map(function (o) { return o.name; }) : [];
+      let count = 0;
+      names.forEach(function (n) { count += (String(n).match(/[⭐🌟★]/g) || []).length; });
+      value = count > 0 ? Math.min(count, 5) : (typeof def === "number" ? def : 0);
+      break;
+    }
+    case "relation": {
+      // 关联字段：值来自预解析的 relationTitles 映射（id -> 标题）
+      const rels = Array.isArray(raw.relation) ? raw.relation : [];
+      const resolved = rels.map(function (r) { return (desc.relationTitles && desc.relationTitles[r.id]) || ""; }).filter(Boolean);
+      if (resolved.length) value = resolved.join(desc.separator || "、");
+      else value = cloneDefault(def);
+      break;
+    }
+    case "title_const": {
+      // 按标题命中查表，用于「页面型数据源无状态字段」时手工指定
+      const titleVal = richText(raw.title);
+      const table = desc.table || {};
+      value = Object.prototype.hasOwnProperty.call(table, titleVal) ? table[titleVal] : cloneDefault(def);
       break;
     }
     default:
@@ -177,7 +224,7 @@ function blocksToNotes(blocks) {
   const out = [];
   (blocks || []).forEach(function (b) {
     if (!b) return;
-    const rt = richText(b[b.type] && b[b.type].rich_text);
+    const rt = richTextMarked(b[b.type] && b[b.type].rich_text);
     if (!rt.trim()) return;
     if (b.type === "quote" || b.type === "callout") {
       out.push({ type: "quote", text: rt });
@@ -198,16 +245,16 @@ function blocksToBody(blocks) {
   (blocks || []).forEach(function (b) {
     if (!b) return;
     if (b.type === "heading_1" || b.type === "heading_2" || b.type === "heading_3") {
-      const t = richText(b[b.type].rich_text);
+      const t = richTextMarked(b[b.type].rich_text);
       if (t.trim()) out.push({ h2: t });
     } else if (b.type === "bulleted_list_item" || b.type === "numbered_list_item" || b.type === "to_do") {
-      const t = richText(b[b.type].rich_text);
+      const t = richTextMarked(b[b.type].rich_text);
       if (t.trim()) out.push({ li: t });
     } else if (b.type === "quote") {
-      const t = richText(b.quote.rich_text);
+      const t = richTextMarked(b.quote.rich_text);
       if (t.trim()) out.push({ quote: t, source: "" });
     } else if (b.type === "paragraph") {
-      const t = richText(b.paragraph.rich_text);
+      const t = richTextMarked(b.paragraph.rich_text);
       if (t.trim()) out.push({ p: t });
     }
   });
@@ -241,6 +288,32 @@ async function notionFetch(url, init, opts) {
     throw new Error("Notion API " + res.status + " " + res.statusText + " @ " + url + " :: " + detail.slice(0, 300));
   }
   return res.json();
+}
+
+/**
+ * 读取某个页面下的全部子页面（用于「非数据库」型数据源，如 AI 学习页）。
+ * @param {string} pageId 父页面 id
+ * @param {object} opts { token, version, base, fetchImpl }
+ * @returns {Promise<Array>} page 数组（仅 child_page）
+ */
+async function queryPageChildren(pageId, opts) {
+  const base = opts.base || API_BASE_DEFAULT;
+  const out = [];
+  let cursor = null;
+  do {
+    let url = base + "/blocks/" + pageId + "/children?page_size=100";
+    if (cursor) url += "&start_cursor=" + cursor;
+    const res = await notionFetch(url, { method: "GET" }, opts);
+    const results = (res && res.results) || [];
+    results.forEach(function (b) {
+      if (b && b.type === "child_page") {
+        // 伪造成 page 形状，供 readField 统一消费
+        out.push({ id: b.id, properties: { "名称": { type: "title", title: [{ plain_text: b.child_page.title }] } } });
+      }
+    });
+    cursor = res && res.has_more ? res.next_cursor : null;
+  } while (cursor);
+  return out;
 }
 
 /**
@@ -311,51 +384,118 @@ async function fetchAll(options) {
   };
 
   const order = ["ai", "library", "method", "travel", "words"];
+  const failed = [];
 
   for (let i = 0; i < order.length; i++) {
     const mod = order[i];
     const cfg = src[mod];
-    if (!cfg || !cfg.dataSourceId) {
+    if (!cfg || (!cfg.dataSourceId && !cfg.pageId)) {
       log("[notion] 模块 " + mod + " 未配置数据源，跳过");
       data.modules.push(Object.assign({ id: mod, count: 0 }, MODULES_META[mod]));
+      failed.push(mod);
       continue;
     }
-    const pages = await queryDatabase(cfg.dataSourceId, callOpts);
+
+    /* 单模块失败隔离：任一模块出错只标记该模块 failed，
+       由其上层（build.js）回退到本地数据，不影响其余模块。 */
+    let pages;
+    try {
+      if (cfg.type === "page") {
+        pages = await queryPageChildren(cfg.pageId, callOpts);
+      } else {
+        pages = await queryDatabase(cfg.dataSourceId, callOpts);
+      }
+    } catch (e) {
+      log("[notion] 模块 " + mod + " 同步失败：" + e.message);
+      data.modules.push(Object.assign({ id: mod, count: 0 }, MODULES_META[mod]));
+      failed.push(mod);
+      continue;
+    }
+
     const listKey = cfg.listKey;
     const items = [];
+    let fieldErr = null;
+
+    /* relation 预解析：若任一字段是 relation 类型，先把所有关联 id 批量
+       解析成标题，写入 desc.relationTitles，供 readField 同步取值。 */
+    const fields = cfg.fields || {};
+    const relKeys = Object.keys(fields).filter(function (k) { return fields[k].type === "relation"; });
+    if (relKeys.length) {
+      const idSet = {};
+      relKeys.forEach(function (k) {
+        const propName = fields[k].prop;
+        pages.forEach(function (pg) {
+          const raw = prop(pg, propName);
+          const rels = raw && Array.isArray(raw.relation) ? raw.relation : [];
+          rels.forEach(function (r) { if (r && r.id) idSet[r.id] = true; });
+        });
+      });
+      const ids = Object.keys(idSet);
+      if (ids.length) {
+        const titleMap = {};
+        // 串行 + 去重，避免触发 Notion 速率限制（平均 3 req/s）
+        for (let ri = 0; ri < ids.length; ri++) {
+          try {
+            const pg = await notionFetch(base + "/pages/" + ids[ri], { method: "GET" }, callOpts);
+            const props = (pg && pg.properties) || {};
+            let title = "";
+            Object.keys(props).forEach(function (pk) {
+              if (!title && props[pk] && props[pk].type === "title") title = richText(props[pk].title);
+            });
+            if (title) titleMap[ids[ri]] = title;
+          } catch (e) {
+            log("[notion] relation 解析失败 " + ids[ri] + "：" + e.message);
+          }
+        }
+        relKeys.forEach(function (k) { fields[k].relationTitles = titleMap; });
+        log("[notion] " + mod + " 解析 relation 标题 " + Object.keys(titleMap).length + "/" + ids.length + " 条");
+      }
+    }
 
     for (let j = 0; j < pages.length; j++) {
       const page = pages[j];
-      const item = {};
-      const fields = cfg.fields || {};
-      Object.keys(fields).forEach(function (key) {
-        item[key] = readField(page, fields[key]);
-      });
-      // 保留 Notion 原生 page id 作为稳定 id 优先值
-      item.id = (page.id || "").replace(/-/g, "");
+      try {
+        const item = {};
+        Object.keys(fields).forEach(function (key) {
+          item[key] = readField(page, fields[key]);
+        });
+        // 保留 Notion 原生 page id 作为稳定 id 优先值
+        item.id = (page.id || "").replace(/-/g, "");
 
-      // 子块（笔记 / 正文 / 章节）
-      const cb = cfg.childrenBlocks;
-      if (cb) {
-        try {
-          const blocks = await getBlocks(page.id, callOpts, 0);
-          if (cb.target === "note") item.note = blocksToNotes(blocks);
-          else if (cb.target === "body") item.body = blocksToBody(blocks);
-          else if (cb.target === "sections") {
-            item.sections = blocksToSections(blocks);
+        // 子块（笔记 / 正文 / 章节）
+        const cb = cfg.childrenBlocks;
+        if (cb) {
+          try {
+            const blocks = await getBlocks(page.id, callOpts, 0);
+            if (cb.target === "note") item.note = blocksToNotes(blocks);
+            else if (cb.target === "body") item.body = blocksToBody(blocks);
+            else if (cb.target === "sections") {
+              item.sections = blocksToSections(blocks);
+            }
+          } catch (e) {
+            log("[notion] 模块 " + mod + " 子块拉取失败：" + e.message);
           }
-        } catch (e) {
-          log("[notion] 模块 " + mod + " 子块拉取失败：" + e.message);
         }
-      }
 
-      // 图书馆：noteAvailable 由 note 是否非空推导
-      if (mod === "library") {
-        item.note = item.note || [];
-        item.noteAvailable = item.note.length > 0;
-        if (!item.noteTitle) item.noteTitle = "读书笔记";
+        // 图书馆：noteAvailable 由 note 是否非空推导
+        if (mod === "library") {
+          item.note = item.note || [];
+          item.noteAvailable = item.note.length > 0;
+          if (!item.noteTitle) item.noteTitle = "读书笔记";
+        }
+        items.push(item);
+      } catch (e) {
+        // 单条记录字段读取失败：跳过该条，不拖垮整个模块
+        fieldErr = e;
+        log("[notion] 模块 " + mod + " 第 " + (j + 1) + " 条解析失败，已跳过：" + e.message);
       }
-      items.push(item);
+    }
+
+    if (fieldErr && items.length === 0) {
+      log("[notion] 模块 " + mod + " 全部记录解析失败，标记回退");
+      data.modules.push(Object.assign({ id: mod, count: 0 }, MODULES_META[mod]));
+      failed.push(mod);
+      continue;
     }
 
     data[mod][listKey] = items;
@@ -380,7 +520,7 @@ async function fetchAll(options) {
     { id: "装X语录", name: "装X语录" }
   ];
 
-  return { ok: true, data: data, counts: counts };
+  return { ok: true, data: data, counts: counts, failed: failed };
 }
 
 /**
@@ -397,7 +537,7 @@ function blocksToSections(blocks) {
       if (current) sections.push(current);
       current = { icon: "bag", title: richText(b[b.type].rich_text), items: [] };
     } else if (b.type === "bulleted_list_item" || b.type === "numbered_list_item" || b.type === "to_do" || b.type === "paragraph") {
-      const t = richText(b[b.type].rich_text);
+      const t = richTextMarked(b[b.type].rich_text);
       if (!t.trim()) return;
       if (!current) current = { icon: "bag", title: "清单", items: [] };
       current.items.push(t);
@@ -411,9 +551,11 @@ module.exports = {
   loadMap: loadMap,
   prop: prop,
   richText: richText,
+  richTextMarked: richTextMarked,
   readField: readField,
   getBlocks: getBlocks,
   queryDatabase: queryDatabase,
+  queryPageChildren: queryPageChildren,
   blocksToNotes: blocksToNotes,
   blocksToBody: blocksToBody,
   blocksToSections: blocksToSections,
