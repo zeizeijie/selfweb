@@ -108,15 +108,33 @@ node tools/build.js
 
 ### 部署
 
-已内置 `vercel.json` 与 `netlify.toml`，发布目录为 `site/dist`：
+发布目录统一为 `site/dist`。
 
-| 平台           | 操作                             |
-| ------------ | ------------------------------ |
-| Vercel       | 导入仓库，自动识别配置                    |
-| Netlify      | 导入仓库，自动识别配置                    |
+#### Cloudflare Pages（推荐）
+
+| 配置项 | 值 |
+| --- | --- |
+| Build command | `npm run build` |
+| Build output directory | `site/dist` |
+| 环境变量 | `NODE_VERSION=18`、`NOTION_TOKEN=<token>`、`SITE_URL=<域名>` |
+
+操作步骤：创建 GitHub 仓库并推送 → Cloudflare Dashboard → Workers & Pages → Connect to Git → 填入上表配置。
+
+> Cloudflare **不读** `wrangler.toml`，响应头配置由构建脚本生成到 `site/dist/_headers`；自定义 404 依赖输出目录里的 `404.html`（`_redirects` 不支持 404 rewrite）。
+
+完整步骤与验证清单见 **[docs/deploy-cloudflare-pages.md](docs/deploy-cloudflare-pages.md)**。
+
+#### 其他平台
+
+已内置 `vercel.json` 与 `netlify.toml`：
+
+| 平台 | 操作 |
+| --- | --- |
+| Vercel | 导入仓库，自动识别配置 |
+| Netlify | 导入仓库，自动识别配置 |
 | GitHub Pages | 将 `site/dist` 推到 `gh-pages` 分支 |
 
-记得设置环境变量 `SITE_URL` 为你的正式域名（影响 sitemap 与分享卡片里的绝对地址）。
+记得设置环境变量 `SITE_URL` 为你的正式域名（影响 sitemap 与分享卡片里的绝对地址）；如需 Notion 同步，同时配置 `NOTION_TOKEN`。
 
 ---
 

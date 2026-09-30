@@ -257,6 +257,35 @@ function build404(contract) {
   ].join("\n");
 }
 
+/**
+ * 生成 Cloudflare Pages 的 `_headers` 文件（纯文本，放在构建输出目录）。
+ * 说明：Pages 不读 wrangler.toml 的 [[headers]]，只认输出目录里的 `_headers`。
+ *       该文件本身不会被作为静态资源下发。
+ * @returns {string} _headers 内容
+ */
+function buildHeaders() {
+  return [
+    "# Cloudflare Pages 响应头配置（由 tools/seo.js 生成，请勿手工编辑）",
+    "# 参考：https://developers.cloudflare.com/pages/configuration/headers/",
+    "",
+    "# 带内容指纹的静态资源：强缓存一年",
+    "/assets/*",
+    "  Cache-Control: public, max-age=31536000, immutable",
+    "",
+    "# HTML 不缓存，保证内容更新即时生效",
+    "/*.html",
+    "  Cache-Control: public, max-age=0, must-revalidate",
+    "",
+    "# 全站安全响应头",
+    "/*",
+    "  X-Content-Type-Options: nosniff",
+    "  X-Frame-Options: SAMEORIGIN",
+    "  Referrer-Policy: strict-origin-when-cross-origin",
+    "  Permissions-Policy: geolocation=(), microphone=(), camera=()",
+    ""
+  ].join("\n");
+}
+
 module.exports = {
   MODULE_SEO: MODULE_SEO,
   seoFor: seoFor,
@@ -267,5 +296,6 @@ module.exports = {
   buildRobots: buildRobots,
   buildSitemap: buildSitemap,
   buildManifest: buildManifest,
+  buildHeaders: buildHeaders,
   build404: build404
 };

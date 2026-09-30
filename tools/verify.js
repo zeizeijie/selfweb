@@ -123,11 +123,24 @@ function main() {
     site.words.list.every(function (w) { return ["人生感悟", "休闲文案", "为人处事", "装X语录"].indexOf(w.category) >= 0; });
   check("枚举合法性", enumsOk);
 
-  // 8) SEO 产物（生成到 site/dist/，入口 HTML 由 templates/site-template.html 注入而来）
+  // 8) SEO / 部署产物（生成到 site/dist/，入口 HTML 由 templates/site-template.html 注入而来）
   ["index.html", "ai.html", "library.html", "method.html", "travel.html", "words.html",
-    "robots.txt", "sitemap.xml", "404.html", "site.webmanifest"].forEach(function (f) {
+    "robots.txt", "sitemap.xml", "404.html", "site.webmanifest", "_headers"].forEach(function (f) {
       check("SEO 产物存在：dist/" + f, fs.existsSync(path.join(ROOT, "site", "dist", f)));
     });
+
+  // Cloudflare Pages 的 _headers 必须放在输出目录，且含关键缓存/安全规则
+  const hdrPath = path.join(ROOT, "site", "dist", "_headers");
+  if (fs.existsSync(hdrPath)) {
+    const hdr = fs.readFileSync(hdrPath, "utf8");
+    check("_headers 含 assets 强缓存规则", /\/assets\/\*/.test(hdr) && /immutable/.test(hdr));
+    check("_headers 含安全响应头", /X-Content-Type-Options:\s*nosniff/.test(hdr) && /X-Frame-Options/.test(hdr));
+    check("_headers 不含 tab 缩进（Pages 要求空格缩进）", !/\t/.test(hdr));
+  }
+
+  // Cloudflare Pages 靠输出目录里的 404.html 实现自定义 404（_redirects 不支持 404 rewrite）
+  check("dist/404.html 存在（Cloudflare 自定义 404 约定）",
+    fs.existsSync(path.join(ROOT, "site", "dist", "404.html")));
 
   // 9) 构建幂等性：纯净模板不得被注入污染
   const tplPath = path.join(ROOT, "templates", "site-template.html");

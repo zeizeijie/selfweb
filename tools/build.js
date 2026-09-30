@@ -227,7 +227,7 @@ function copySiteToDist() {
   // 这些文件由 seo.js 生成到 dist，不可被源目录同名文件覆盖
   const generated = new Set(
     Object.keys(seo.MODULE_SEO).map(function (m) { return seo.MODULE_SEO[m].path; })
-      .concat(["index.html", "robots.txt", "sitemap.xml", "site.webmanifest", "404.html"])
+      .concat(["index.html", "robots.txt", "sitemap.xml", "site.webmanifest", "404.html", "_headers"])
   );
   const entries = fs.readdirSync(SITE_DIR, { withFileTypes: true });
   entries.forEach(function (ent) {
@@ -294,7 +294,9 @@ async function run(argv) {
     writeFile(path.join(DIST_DIR, "sitemap.xml"), seo.buildSitemap(contract, siteUrl));
     writeFile(path.join(DIST_DIR, "site.webmanifest"), seo.buildManifest(contract));
     writeFile(path.join(DIST_DIR, "404.html"), seo.build404(contract));
-    log("[seo] 已生成 6 个入口 HTML + robots.txt + sitemap.xml + site.webmanifest + 404.html");
+    // Cloudflare Pages 专用：响应头配置必须放在构建输出目录（Pages 不读 wrangler.toml）
+    writeFile(path.join(DIST_DIR, "_headers"), seo.buildHeaders());
+    log("[seo] 已生成 6 个入口 HTML + robots.txt + sitemap.xml + site.webmanifest + 404.html + _headers");
 
     /* ---- 5. 图标 / 站点资产 ---- */
     try {
