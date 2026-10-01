@@ -47,7 +47,8 @@
         "cover": { "prop": "封面", "type": "files_or_url", "default": "" },
         "readTime": { "prop": "阅读时间", "type": "date", "default": "" },
         "noteTitle": { "prop": "备注", "type": "rich_text", "default": "读书笔记" }
-      }
+      },
+      "childrenBlocks": { "prop": "读书笔记", "target": "note" }
     },
     "method": {
       "label": "方法论",

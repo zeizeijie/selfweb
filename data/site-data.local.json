@@ -107,6 +107,20 @@
   },
   "library": {
     "intro": "书是避难所，也是他乡。这里存放着我读过、在读、想读的书，以及它们在我身上留下的划痕。",
+    "years": [
+      {
+        "year": "2025",
+        "goal": 20,
+        "read": 7,
+        "total": 9
+      },
+      {
+        "year": "2024",
+        "goal": null,
+        "read": 1,
+        "total": 1
+      }
+    ],
     "books": [
       {
         "title": "三体",
@@ -116,6 +130,7 @@
         "tag": "科幻",
         "cover": "https://img9.doubanio.com/view/subject/s/public/s2768378.jpg",
         "readTime": "2024.11 — 2024.12",
+        "year": "2024",
         "noteAvailable": true,
         "noteTitle": "三体｜读书笔记",
         "note": [
@@ -160,7 +175,8 @@
             "type": "comment",
             "text": "关于技术加速与人类未来的乐观推演。作者相信指数级增长终将把人类带向奇点，而我们需要思考的是：当变化快过适应，人该如何自处。"
           }
-        ]
+        ],
+        "year": "2025"
       },
       {
         "title": "明朝那些事",
@@ -203,7 +219,8 @@
             "text": "天下英雄豪杰无不毁誉参半，惟庸人无咎亦无誉。",
             "source": "梁启超"
           }
-        ]
+        ],
+        "year": "2025"
       },
       {
         "title": "黄金时代",
@@ -220,7 +237,8 @@
             "type": "quote",
             "text": "那一天我二十一岁，在我一生的黄金时代，我有好多奢望。我想爱，想吃，还想在一瞬间变成天上半明半暗的云。后来我才知道，生活就是个缓慢受槌的过程，人一天天老下去，奢望也一天天消失，最后变得像挨了槌的牛一样。"
           }
-        ]
+        ],
+        "year": "2025"
       },
       {
         "title": "追风筝的人",
@@ -230,7 +248,8 @@
         "tag": "文学",
         "cover": "https://img1.doubanio.com/view/subject/s/public/s1727290.jpg",
         "readTime": "2025",
-        "noteAvailable": false
+        "noteAvailable": false,
+        "year": "2025"
       },
       {
         "title": "杀死一只知更鸟",
@@ -240,7 +259,8 @@
         "tag": "文学",
         "cover": "https://img3.doubanio.com/view/subject/s/public/s23128183.jpg",
         "readTime": "2025",
-        "noteAvailable": false
+        "noteAvailable": false,
+        "year": "2025"
       },
       {
         "title": "小王子",
@@ -250,7 +270,8 @@
         "tag": "童话",
         "cover": "https://img1.doubanio.com/view/subject/s/public/s1237549.jpg",
         "readTime": "2025",
-        "noteAvailable": false
+        "noteAvailable": false,
+        "year": "2025"
       },
       {
         "title": "诗里特别有禅",
@@ -260,7 +281,8 @@
         "tag": "诗词",
         "cover": "https://img3.doubanio.com/view/subject/s/public/s26653983.jpg",
         "readTime": "2025",
-        "noteAvailable": false
+        "noteAvailable": false,
+        "year": "2025"
       },
       {
         "title": "好好告别",
@@ -270,7 +292,8 @@
         "tag": "人文",
         "cover": "https://img9.doubanio.com/view/subject/l/public/s33795326.jpg",
         "readTime": "2025.10 —",
-        "noteAvailable": false
+        "noteAvailable": false,
+        "year": "2025"
       },
       {
         "title": "曾国藩家书",
@@ -280,7 +303,8 @@
         "tag": "历史",
         "cover": "https://img3.doubanio.com/view/subject/l/public/s29802987.jpg",
         "readTime": "2025.10 —",
-        "noteAvailable": false
+        "noteAvailable": false,
+        "year": "2025"
       },
       {
         "title": "不能承受的生命之轻",
@@ -290,7 +314,8 @@
         "tag": "哲学",
         "cover": "https://img3.doubanio.com/view/subject/s/public/s34278612.jpg",
         "readTime": "",
-        "noteAvailable": false
+        "noteAvailable": false,
+        "year": ""
       },
       {
         "title": "毛泽东选集",
@@ -301,7 +326,8 @@
         "cover": "",
         "coverFallback": "linear-gradient(135deg,#b3352e,#7a1d18)",
         "readTime": "2025 —",
-        "noteAvailable": false
+        "noteAvailable": false,
+        "year": ""
       }
     ],
     "favorites": [

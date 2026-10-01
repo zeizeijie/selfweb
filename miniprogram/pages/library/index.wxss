@@ -17,3 +17,76 @@
 .book-grid {
   padding: 0 var(--gap-page);
 }
+
+/* ---------------- 年报卡（阅读目标与总结） ---------------- */
+.years {
+  padding: 8rpx var(--gap-page) 8rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.year-card {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-m); /* 18px */
+  padding: 36rpx 40rpx 32rpx;
+  box-shadow: var(--shadow-s);
+  transition: border-color .3s var(--ease), box-shadow .3s var(--ease);
+}
+
+.year-card.active {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 6rpx rgba(0, 113, 227, .12), var(--shadow-s);
+}
+
+.yc-head {
+  display: flex;
+  align-items: baseline;
+  gap: 24rpx;
+  margin-bottom: 20rpx;
+}
+
+.yc-num {
+  font-size: 60rpx; /* 30px */
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.yc-summary {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+}
+
+.yc-summary.done {
+  color: var(--success);
+}
+
+.yc-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28rpx;
+  font-size: 26rpx;
+  color: var(--text-tertiary);
+  margin-bottom: 24rpx;
+  font-variant-numeric: tabular-nums;
+}
+
+.yc-bar {
+  height: 12rpx; /* 6px */
+  border-radius: var(--radius-pill);
+  background: var(--bg-alt);
+  overflow: hidden;
+}
+
+.yc-fill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: var(--blue);
+  transition: width .6s var(--ease);
+}
+
+.yc-fill.done {
+  background: var(--success);
+}

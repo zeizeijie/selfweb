@@ -128,7 +128,18 @@
   }
 
   /* ---------------- 首页（读 modules[].count，不再硬编码） ---------------- */
+  /** 数字游民起点：2026-10-01 00:00:00 北京时间（UTC+8），下限 1 天 */
+  var NOMAD_START = new Date("2026-10-01T00:00:00+08:00").getTime();
+
+  function nomadDayCount() {
+    return Math.max(1, Math.floor((Date.now() - NOMAD_START) / 86400000) + 1);
+  }
+
   function renderHome() {
+    var nomad = document.getElementById("nomadDay");
+    if (nomad) {
+      nomad.textContent = "努力成为数字游民的第 " + nomadDayCount() + " 天";
+    }
     var meta = document.getElementById("heroMeta");
     if (meta) {
       meta.innerHTML =
@@ -262,9 +273,12 @@
 
   /* ---------------- 图书馆 ---------------- */
   var libFilter = "all";
+  var libYear = ""; /* 年份筛选态："" = 不限 */
   function renderLibrary() {
     var intro = document.getElementById("libIntro");
     if (intro) intro.textContent = D.library.intro;
+
+    renderLibYears();
 
     var statuses = ["all"].concat(unique(D.library.books.map(function (b) { return b.status; })));
     var labels = { all: "全部" };
@@ -274,12 +288,15 @@
         var n = s === "all" ? D.library.books.length : D.library.books.filter(function (b) { return b.status === s; }).length;
         return '<button class="chip' + (libFilter === s ? " active" : "") + '" data-lib="' + esc(s) + '" aria-pressed="' + (libFilter === s) + '">' +
           (labels[s] || esc(s)) + " · " + n + "</button>";
-      }).join("");
+      }).join("") +
+        (libYear ? '<button class="chip year-chip active" data-lib-year="' + esc(libYear) + '" aria-pressed="true">' + esc(libYear) + ' 年 ✕</button>' : "");
     }
 
     var grid = document.getElementById("bookGrid");
     if (grid) {
-      var list = D.library.books.filter(function (b) { return libFilter === "all" || b.status === libFilter; });
+      var list = D.library.books.filter(function (b) {
+        return (libFilter === "all" || b.status === libFilter) && (!libYear || b.year === libYear);
+      });
       grid.innerHTML = list.length ? list.map(function (b) {
         return '' +
           '<div class="book" data-book="' + esc(b.id) + '" data-id="' + esc(b.id) + '" role="button" tabindex="0">' +
@@ -292,13 +309,47 @@
             '<div class="b-stars">' + stars(b.rating) + "</div>" +
             (b.noteAvailable ? '<div class="b-note">✎ 有读书笔记</div>' : '<div class="b-note" style="visibility:hidden">·</div>') +
           "</div>";
-      }).join("") : emptyStateHtml("这个状态下还没有书", "查看全部");
+      }).join("") : emptyStateHtml("这个筛选下还没有书", "查看全部");
     }
 
     var favs = document.getElementById("favAuthors");
     if (favs) {
       favs.innerHTML = (D.library.favorites || []).map(function (a) { return '<span class="chip">' + esc(a) + "</span>"; }).join("");
     }
+  }
+
+  /** 阅读年报区块：每年一张卡（年份 / 目标 / 已读 / 收录 / 进度 / 总结），无数据时隐藏 */
+  function renderLibYears() {
+    var wrap = document.getElementById("libYears");
+    if (!wrap) return;
+    var years = (D.library && D.library.years) || [];
+    if (!years.length) { wrap.style.display = "none"; return; }
+    wrap.style.display = "";
+    wrap.innerHTML = years.map(function (y) {
+      var hasGoal = typeof y.goal === "number" && y.goal > 0;
+      var denom = hasGoal ? y.goal : (y.total || y.read || 1);
+      var pct = Math.max(0, Math.min(100, denom ? Math.round((y.read / denom) * 100) : 0));
+      var summary;
+      if (hasGoal) {
+        summary = y.read >= y.goal ? "🎉 已达成年度目标" : y.year + " · 距目标还差 " + (y.goal - y.read) + " 本";
+      } else {
+        summary = y.year + " · 已读 " + y.read + " 本";
+      }
+      var goalText = hasGoal ? "目标 " + y.goal + " 本" : "未设目标";
+      return '' +
+        '<div class="lib-year-card' + (libYear === y.year ? " active" : "") + '" data-lib-year="' + esc(y.year) + '" role="button" tabindex="0" aria-pressed="' + (libYear === y.year) + '">' +
+          '<div class="ly-head"><span class="ly-num">' + esc(y.year) + "</span>" +
+            '<span class="ly-summary">' + esc(summary) + "</span></div>" +
+          '<div class="ly-stats"><span>' + goalText + "</span><span>已读 " + y.read + " 本</span><span>收录 " + y.total + " 本</span></div>" +
+          '<div class="ly-bar"><i style="width:' + pct + '%"></i></div>' +
+        "</div>";
+    }).join("");
+  }
+
+  /** 点击年份卡 / 年份 chip：切换该年筛选，再次点击取消 */
+  function toggleLibYear(year) {
+    libYear = (libYear === year) ? "" : year;
+    renderLibrary();
   }
 
   function unique(arr) {
@@ -329,7 +380,8 @@
           "<h2>" + esc(b.title) + "</h2>" +
           '<div class="bd-auth">' + esc(b.author || "佚名") + "</div>" +
           '<div class="bd-info"><span>' + esc(b.status) + "</span><span>" + esc(b.tag) + "</span>" +
-            (b.readTime ? "<span>" + esc(b.readTime) + "</span>" : "") + "</div>" +
+            (b.readTime ? "<span>" + esc(b.readTime) + "</span>" : "") +
+            (b.year ? "<span>" + esc(b.year) + " 年</span>" : "") + "</div>" +
           (b.rating ? '<div class="bd-stars">' + stars(b.rating) + "</div>" : "") +
         "</div>" +
         notesHtml +
@@ -579,10 +631,12 @@
     var emptyBtn = e.target.closest("[data-empty-action]");
     if (emptyBtn) {
       /* 空态「查看全部」：重置所有筛选 */
-      libFilter = "all"; methodFilter = "all"; wordsFilter = "all";
+      libFilter = "all"; methodFilter = "all"; wordsFilter = "all"; libYear = "";
       renderLibrary(); renderMethod(); renderWords();
       return;
     }
+    var ycard = e.target.closest("[data-lib-year]");
+    if (ycard) { toggleLibYear(ycard.getAttribute("data-lib-year")); return; }
     var chip = e.target.closest("[data-lib]");
     if (chip) { libFilter = chip.getAttribute("data-lib"); renderLibrary(); return; }
     var mchip = e.target.closest("[data-method]");
@@ -617,6 +671,8 @@
       if (href && href.indexOf("#") === 0) { e.preventDefault(); location.hash = href; }
       return;
     }
+    var yc = t.closest("[data-lib-year][tabindex]");
+    if (yc) { e.preventDefault(); toggleLibYear(yc.getAttribute("data-lib-year")); return; }
     var bk = t.closest("[data-book][tabindex]");
     if (bk) { e.preventDefault(); openBook(bk.getAttribute("data-book")); return; }
     var ma = t.closest("[data-method-open][tabindex]");
@@ -670,10 +726,7 @@
 
     var foot = document.getElementById("footNote");
     if (foot) {
-      foot.textContent =
-        "内容整理自个人 Notion 工作区（" + countOf("library") + " 本书 · " +
-        countOf("method") + " 条方法论 · " + countOf("travel") + " 段旅程 · " +
-        countOf("words") + " 句收藏）· 设计灵感来自 Apple";
+      foot.textContent = "内容整理自个人 Notion 工作区";
     }
 
     /* __INITIAL_VIEW__：模块入口页（ai.html 等）直接进入对应视图 */

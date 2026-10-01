@@ -11,6 +11,7 @@
     <!-- Hero -->
     <view class="hero">
       <view class="eyebrow">ZEI ZEI JIE</view>
+      <view class="nomad-day">努力成为数字游民的第 {{ nomadDay }} 天</view>
       <view class="h1 hero-title">{{ meta.name }}</view>
       <view class="lead hero-sub">{{ meta.subtitle }}</view>
       <view class="hero-tag">{{ meta.tagline }}</view>
@@ -53,7 +54,7 @@
     <view class="foot">
       <view class="foot-line"></view>
       <view class="foot-text">
-        内容整理自个人 Notion 工作区 · 设计灵感来自 Apple
+        内容整理自个人 Notion 工作区
       </view>
       <view wx:if="{{ owner }}" class="foot-owner">{{ owner }}</view>
     </view>

@@ -85,6 +85,9 @@ const METHOD_CAT_NAME = {
 /** 无效封面占位符前缀 */
 const INVALID_COVER = /^attachment:/i;
 
+/** 是否四位数字年份字符串（如 "2025"） */
+const YEAR_RE = /^(19|20)\d{2}$/;
+
 /** 是否 http(s) 绝对地址 */
 const HTTP_URL = /^https?:\/\//i;
 
@@ -281,6 +284,16 @@ function validate(contract) {
     b.tag = str(b.tag);
     b.cover = str(b.cover);
     b.readTime = str(b.readTime);
+    // 归档年份：四位数字字符串，否则置 ""（未归档）
+    if (!YEAR_RE.test(str(b.year).trim())) {
+      if (str(b.year).trim()) {
+        const ymsg = "[enum] library.books[" + i + "].year = " + JSON.stringify(b.year) + " 非法，置为 \"\"";
+        warns.push(ymsg); warn(ymsg);
+      }
+      b.year = "";
+    } else {
+      b.year = str(b.year).trim();
+    }
     b.noteAvailable = !!b.noteAvailable;
     if (b.noteAvailable && !str(b.noteTitle).trim()) {
       b.noteTitle = "读书笔记";
@@ -296,6 +309,35 @@ function validate(contract) {
     fixCover(b);
   });
   (contract.library = contract.library || {}).favorites = arr(contract.library.favorites).map(str);
+
+  /* ---- library.years（阅读年报：按年聚合的目标 / 已读 / 收录） ---- */
+  const libObj = contract.library;
+  libObj.years = arr(libObj.years).map(function (y, i) {
+    const year = str(y && y.year).trim();
+    if (!YEAR_RE.test(year)) {
+      const msg = "[enum] library.years[" + i + "].year = " + JSON.stringify(y && y.year) + " 非法，已丢弃该条";
+      warns.push(msg); warn(msg);
+      return null;
+    }
+    function nnInt(v, label) {
+      const n = Math.round(Number(v));
+      if (!isFinite(n) || n < 0) {
+        const m = "[enum] library.years[" + i + "]." + label + " = " + JSON.stringify(v) + " 非法，降级为 0";
+        warns.push(m); warn(m);
+        return 0;
+      }
+      return n;
+    }
+    const goal = (y && y.goal == null) ? null : nnInt(y && y.goal, "goal");
+    return { year: year, goal: goal, read: nnInt(y && y.read, "read"), total: nnInt(y && y.total, "total") };
+  }).filter(Boolean);
+  // 去重（同年保留首条）+ 按 year 降序
+  const seenYear = {};
+  libObj.years = libObj.years.filter(function (y) {
+    if (seenYear[y.year]) return false;
+    seenYear[y.year] = true;
+    return true;
+  }).sort(function (a, b) { return a.year < b.year ? 1 : a.year > b.year ? -1 : 0; });
 
   /* ---- method.categories / articles ---- */
   const method = contract.method || (contract.method = {});
@@ -407,7 +449,7 @@ const FALLBACK = {
     { id: "words", name: "Words", icon: "quote", color: "#c2405f", tagline: "记下那些击中过我的话。", desc: "收藏的句子。", count: 0 }
   ],
   ai: { intro: "", projects: [] },
-  library: { intro: "", books: [], favorites: [] },
+  library: { intro: "", books: [], favorites: [], years: [] },
   method: { intro: "", categories: [{ id: "learn", name: "学习方法" }], articles: [] },
   travel: { intro: "", trips: [] },
   words: {

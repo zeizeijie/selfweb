@@ -27,12 +27,21 @@ const TAB_PAGES = {
 /** 默认分享图（与站点资源一致性：assets/og-default.png） */
 const SHARE_IMAGE = "/assets/og-default.png";
 
+/** 数字游民起点：2026-10-01 00:00:00 北京时间（UTC+8） */
+const NOMAD_START = new Date("2026-10-01T00:00:00+08:00").getTime();
+
+/** 努力成为数字游民的第 N 天：相差天数 + 1，下限 1 */
+function nomadDayCount() {
+  return Math.max(1, Math.floor((Date.now() - NOMAD_START) / 86400000) + 1);
+}
+
 Page({
   data: {
     meta: null,
     modules: [],
     stats: [],
     owner: "",
+    nomadDay: 0,
     ready: false
   },
 
@@ -61,6 +70,7 @@ Page({
       modules: modules,
       owner: meta.owner || "",
       stats: this._buildStats(data),
+      nomadDay: nomadDayCount(),
       ready: true
     });
   },

@@ -18,6 +18,24 @@ const path = require("path");
 const API_BASE_DEFAULT = "https://api.notion.com/v1";
 const VERSION_DEFAULT = "2022-06-28";
 
+/* ---------------- 图书馆年度聚合库（硬编码 id） ----------------
+   这两个库尚未进 data/notion-map.json：它们的 schema 是图书馆内部的
+   聚合视图（归档 relation + rollup + 目标 number），不是标准的
+   「一条记录 = 一个契约条目」映射，故在此单独拉取组装。 */
+
+/** 归档库：年份 (title) + 📚 书库 (relation) + 已读汇总 (rollup number) */
+const LIB_ARCHIVE_DB_ID = "1a0f5433-9d28-810d-80d4-d9a3fbeb9570";
+/** 阅读目标库：Name (title) + 阅读目标 (number) + 时段 (date) */
+const LIB_GOAL_DB_ID = "1a0f5433-9d28-81b9-a9a5-c83c8351a920";
+
+/** 归档座行属性名 */
+const ARCHIVE_YEAR_PROP = "年份";
+const ARCHIVE_BOOKS_PROP = "📚 书库";
+const ARCHIVE_ROLLUP_PROP = "已读汇总";
+/** 阅读目标库属性名 */
+const GOAL_NUMBER_PROP = "阅读目标";
+const GOAL_PERIOD_PROP = "时段";
+
 /* ---------------- 映射表加载 ---------------- */
 
 /**
@@ -365,7 +383,7 @@ async function fetchAll(options) {
     },
     modules: [],
     ai: { intro: "", projects: [] },
-    library: { intro: "", books: [], favorites: [] },
+    library: { intro: "", books: [], favorites: [], years: [] },
     method: { intro: "", categories: [], articles: [] },
     travel: { intro: "", trips: [] },
     words: { intro: "", categories: [], list: [] }
@@ -502,6 +520,23 @@ async function fetchAll(options) {
     counts[mod] = items.length;
     data.modules.push(Object.assign({ id: mod, count: items.length }, MODULES_META[mod]));
     log("[notion] " + mod + " 拉取 " + items.length + " 条");
+
+    /* 图书馆年度聚合：library 主列表成功后拉归档库 + 目标库，
+       组装 data.library.years 并把归档年份回填到 books[].year。
+       失败只 log 降级 years=[]，与模块级降级风格一致。 */
+    if (mod === "library") {
+      data.library.years = [];
+      const yearRes = await fetchLibraryYears(data, callOpts, log);
+      data.library.years = yearRes.years;
+      if (Object.keys(yearRes.bookYearById).length) {
+        let filled = 0;
+        data.library.books.forEach(function (b) {
+          b.year = yearRes.bookYearById[String(b.id).replace(/-/g, "")] || "";
+          if (b.year) filled++;
+        });
+        log("[notion] library 已回填归档年份 " + filled + " 本");
+      }
+    }
   }
 
   // 方法论分类（固定枚举，与本地契约一致）
@@ -547,6 +582,107 @@ function blocksToSections(blocks) {
   return sections;
 }
 
+/* ---------------- 图书馆年度聚合（阅读年报） ---------------- */
+
+/**
+ * 从任意字符串中提取 4 位年份（如 "2025" / "1月·阅读目标 2023"）。
+ * @param {string} s
+ * @returns {string} 4 位年份，无则 ""
+ */
+function extractYear(s) {
+  const m = String(s || "").match(/(19|20)\d{2}/);
+  return m ? m[0] : "";
+}
+
+/**
+ * 拉取并组装 library.years（阅读年报）与 books[].year 回填。
+ * 只在 library 模块主列表拉取成功后调用；任何失败只 log 警告降级为 years=[]，不中断。
+ * @param {object} data fetchAll 正在组装的契约对象（原地修改 data.library）
+ * @param {object} callOpts { token, version, base, fetchImpl }
+ * @param {Function} log 日志函数
+ * @returns {Promise<{years:Array, bookYearById:object}>}
+ */
+async function fetchLibraryYears(data, callOpts, log) {
+  const emptyResult = { years: [], bookYearById: {} };
+  const books = (data.library && data.library.books) || [];
+  try {
+    // 书页 id（含连字符与不含两种形态）→ 已读状态，供 rollup 缺失时兜底计数
+    const statusById = {};
+    books.forEach(function (b) {
+      if (b && b.id) statusById[String(b.id).replace(/-/g, "")] = b.status;
+    });
+
+    // ① 归档库：年份 title + 📚 书库 relation + 已读汇总 rollup
+    const archivePages = await queryDatabase(LIB_ARCHIVE_DB_ID, callOpts);
+    const years = [];
+    const bookYearById = {};
+    archivePages.forEach(function (pg) {
+      const yearProp = prop(pg, ARCHIVE_YEAR_PROP);
+      const year = extractYear(yearProp && yearProp.title ? richText(yearProp.title) : "");
+      if (!year) {
+        log("[notion] 归档条目年份无法解析，已跳过：" + richText((yearProp && yearProp.title) || []));
+        return;
+      }
+      const relProp = prop(pg, ARCHIVE_BOOKS_PROP);
+      const rels = (relProp && Array.isArray(relProp.relation)) ? relProp.relation : [];
+      const ids = rels.map(function (r) { return r && r.id ? String(r.id).replace(/-/g, "") : ""; }).filter(Boolean);
+      ids.forEach(function (id) {
+        if (!bookYearById[id]) bookYearById[id] = year; // 一书只归第一个年
+      });
+
+      // 已读数：优先 rollup number，缺失则自己数 relation 中状态=已读的
+      const rollupProp = prop(pg, ARCHIVE_ROLLUP_PROP);
+      let read = (rollupProp && typeof rollupProp.number === "number") ? rollupProp.number : null;
+      if (read === null) {
+        read = ids.filter(function (id) { return statusById[id] === "已读"; }).length;
+      }
+
+      // 汇总去重（同年多条归档合并：目标取后配，read/total 取最大）
+      const exist = years.filter(function (y) { return y.year === year; })[0];
+      if (exist) {
+        exist.read = Math.max(exist.read, Math.round(read));
+        exist.total = Math.max(exist.total, ids.length);
+      } else {
+        years.push({ year: year, goal: null, read: Math.round(read), total: ids.length });
+      }
+    });
+
+    // ② 阅读目标库：Name title + 阅读目标 number + 时段 date（取年份）
+    const goalPages = await queryDatabase(LIB_GOAL_DB_ID, callOpts);
+    const goalByYear = {};
+    goalPages.forEach(function (pg) {
+      const props = pg.properties || {};
+      let name = "";
+      Object.keys(props).forEach(function (pk) {
+        if (!name && props[pk] && props[pk].type === "title") name = richText(props[pk].title);
+      });
+      const periodProp = prop(pg, GOAL_PERIOD_PROP);
+      const periodYear = periodProp && periodProp.date && periodProp.date.start
+        ? extractYear(String(periodProp.date.start).slice(0, 10)) : "";
+      const year = extractYear(name) || periodYear;
+      if (!year) return; // 两条来源都对不上年份 → 忽略
+      const numProp = prop(pg, GOAL_NUMBER_PROP);
+      if (numProp && typeof numProp.number === "number" && numProp.number >= 0) {
+        goalByYear[year] = Math.round(numProp.number);
+      }
+    });
+
+    // 组装：goal 从目标库按年份匹配，没匹配到保持 null
+    years.forEach(function (y) {
+      y.goal = Object.prototype.hasOwnProperty.call(goalByYear, y.year) ? goalByYear[y.year] : null;
+    });
+    years.sort(function (a, b) { return a.year < b.year ? 1 : a.year > b.year ? -1 : 0; });
+
+    log("[notion] library 年报组装完成：" + years.map(function (y) {
+      return y.year + "(目标" + (y.goal == null ? "-" : y.goal) + "/已读" + y.read + "/收录" + y.total + ")";
+    }).join("、"));
+    return { years: years, bookYearById: bookYearById };
+  } catch (e) {
+    log("[notion] library 年报拉取失败，降级为 years=[]：" + e.message);
+    return emptyResult;
+  }
+}
+
 module.exports = {
   loadMap: loadMap,
   prop: prop,
@@ -559,6 +695,7 @@ module.exports = {
   blocksToNotes: blocksToNotes,
   blocksToBody: blocksToBody,
   blocksToSections: blocksToSections,
+  fetchLibraryYears: fetchLibraryYears,
   fetchAll: fetchAll,
   API_BASE_DEFAULT: API_BASE_DEFAULT,
   VERSION_DEFAULT: VERSION_DEFAULT

@@ -112,7 +112,8 @@ module.exports = {
         "noteTitle": "读书笔记",
         "id": "280f54339d2880a09927ed5d792d6c1c",
         "note": [],
-        "noteAvailable": false
+        "noteAvailable": false,
+        "year": "2025"
       },
       {
         "title": "好好告别",
@@ -125,7 +126,8 @@ module.exports = {
         "noteTitle": "读书笔记",
         "id": "280f54339d2880baa153e75bfda9a71f",
         "note": [],
-        "noteAvailable": false
+        "noteAvailable": false,
+        "year": "2025"
       },
       {
         "title": "毛泽东选集",
@@ -138,7 +140,8 @@ module.exports = {
         "noteTitle": "读书笔记",
         "id": "208f54339d288085975df2eaf6b5e5c9",
         "note": [],
-        "noteAvailable": false
+        "noteAvailable": false,
+        "year": ""
       },
       {
         "title": "不能承受的生命之轻",
@@ -151,7 +154,8 @@ module.exports = {
         "noteTitle": "读书笔记",
         "id": "208f54339d28806287b4ede2d04df038",
         "note": [],
-        "noteAvailable": false
+        "noteAvailable": false,
+        "year": ""
       },
       {
         "title": "诗里特别有禅",
@@ -164,7 +168,8 @@ module.exports = {
         "noteTitle": "读书笔记",
         "id": "208f54339d2880b99411f600f946523c",
         "note": [],
-        "noteAvailable": false
+        "noteAvailable": false,
+        "year": "2025"
       },
       {
         "title": "小王子",
@@ -177,7 +182,8 @@ module.exports = {
         "noteTitle": "读书笔记",
         "id": "208f54339d2880f180c3f4394f4af32c",
         "note": [],
-        "noteAvailable": false
+        "noteAvailable": false,
+        "year": "2025"
       },
       {
         "title": "杀死一只知根鸟（To Kill a Mocking Bird）",
@@ -190,7 +196,8 @@ module.exports = {
         "noteTitle": "读书笔记",
         "id": "208f54339d288064a20ce28cbfaf7545",
         "note": [],
-        "noteAvailable": false
+        "noteAvailable": false,
+        "year": "2025"
       },
       {
         "title": "追风筝的人（The Kite Runner）",
@@ -203,7 +210,8 @@ module.exports = {
         "noteTitle": "读书笔记",
         "id": "208f54339d288001a728d5abb5cd6f1f",
         "note": [],
-        "noteAvailable": false
+        "noteAvailable": false,
+        "year": "2025"
       },
       {
         "title": "黄金时代",
@@ -213,10 +221,17 @@ module.exports = {
         "tag": "",
         "cover": "https://img3.doubanio.com/view/subject/s/public/s1076372.jpg",
         "readTime": "",
-        "noteTitle": "读书笔记",
+        "noteTitle": "黄金时代｜读书笔记",
         "id": "208f54339d2880c99f3bd00cac7292e2",
-        "note": [],
-        "noteAvailable": false
+        "note": [
+          {
+            "type": "quote",
+            "text": "那一天我二十一岁，在我一生的黄金时代，我有好多奢望。我想爱，想吃，还想在一瞬间变成天上半明半暗的云。后来我才知道，生活就是个缓慢受槌的过程，人一天天老下去，奢望也一天天消失，最后变得像挨了槌的牛一样。",
+            "source": ""
+          }
+        ],
+        "noteAvailable": true,
+        "year": "2025"
       },
       {
         "title": "明朝那些事",
@@ -224,13 +239,44 @@ module.exports = {
         "rating": 5,
         "status": "已读",
         "tag": "",
-        "cover": "",
+        "cover": "https://img9.doubanio.com/view/subject/s/public/s3745215.jpg",
         "readTime": "",
-        "noteTitle": "读书笔记",
+        "noteTitle": "明朝那些事｜读书笔记",
         "id": "208f54339d288021b462eb514aca052d",
-        "note": [],
-        "noteAvailable": false,
-        "coverFallback": "linear-gradient(135deg,#86868b,#48484a)"
+        "note": [
+          {
+            "type": "quote",
+            "text": "所谓成功，就是用自己喜欢的方式度过人生。",
+            "source": "当年明月"
+          },
+          {
+            "type": "quote",
+            "text": "张牙舞爪的人，往往是脆弱的，因为真正强大的人，是自信的，自信就会温和，温和就会坚定。",
+            "source": "当年明月"
+          },
+          {
+            "type": "quote",
+            "text": "能改的，叫缺点；不能改的，叫弱点。",
+            "source": ""
+          },
+          {
+            "type": "quote",
+            "text": "你可以失败一百次甚至上千次，但是一定要赢最后一次。",
+            "source": "刘邦"
+          },
+          {
+            "type": "quote",
+            "text": "世以不得第为耻，吾以不得第动心为耻。",
+            "source": "王阳明"
+          },
+          {
+            "type": "quote",
+            "text": "天下英雄豪杰无不毁誉参半，惟庸人无咎亦无誉。",
+            "source": "梁启超"
+          }
+        ],
+        "noteAvailable": true,
+        "year": "2025"
       },
       {
         "title": "奇点更近",
@@ -240,10 +286,17 @@ module.exports = {
         "tag": "",
         "cover": "https://img3.doubanio.com/view/subject/s/public/s34962527.jpg",
         "readTime": "",
-        "noteTitle": "读书笔记",
+        "noteTitle": "奇点更近｜读书笔记",
         "id": "208f54339d288019ad79d6c1826498c7",
-        "note": [],
-        "noteAvailable": false
+        "note": [
+          {
+            "type": "comment",
+            "text": "关于技术加速与人类未来的乐观推演。作者相信指数级增长终将把人类带向奇点，而我们需要思考的是：当变化快过适应，人该如何自处。",
+            "source": ""
+          }
+        ],
+        "noteAvailable": true,
+        "year": "2025"
       },
       {
         "title": "三体",
@@ -251,16 +304,61 @@ module.exports = {
         "rating": 5,
         "status": "已读",
         "tag": "科幻",
-        "cover": "",
+        "cover": "https://img9.doubanio.com/view/subject/s/public/s2768378.jpg",
         "readTime": "2024-11-17",
-        "noteTitle": "读书笔记",
+        "noteTitle": "三体｜读书笔记",
         "id": "208f54339d2880febed6f779b1b267b2",
-        "note": [],
-        "noteAvailable": false,
-        "coverFallback": "linear-gradient(135deg,#86868b,#48484a)"
+        "note": [
+          {
+            "type": "quote",
+            "text": "绝望的时候不妨跳出当下的困境，拉长时间尺度，发现其实一切都还好。个人而言，甚至难以回想起那些曾被认为完全无法承受痛苦的感觉。",
+            "source": ""
+          },
+          {
+            "type": "quote",
+            "text": "在这些山的眼中，人类世界可能只是它们在一个悠闲的下午看到的事：有一些活着的小东西在平原上出现了……再过一会儿，亮光和烟都消失了，活着的小东西也消失了。仅此而已。",
+            "source": ""
+          },
+          {
+            "type": "comment",
+            "text": "是非成败转头空，青山依旧在，几度夕阳红。在山看来，人类的热闹它毫不在意，如同人类看向地上忙碌的蚂蚁。",
+            "source": ""
+          },
+          {
+            "type": "quote",
+            "text": "真那样的话，你仍然很幸运，大多数人，到死都没向尘世之外瞥一眼。",
+            "source": ""
+          },
+          {
+            "type": "comment",
+            "text": "想，都是问题；做，才有答案。面对困难时把注意力放在我还能做什么，而不是陷入不能改变的内耗中。长路漫漫，行则将至。",
+            "source": ""
+          },
+          {
+            "type": "quote",
+            "text": "人只会对势均力敌或者更强大的人给予尊重。至于爱在什么位置，从我的经验看，不长久的爱是从下而上的仰视或者从上而下的包容，更长久的爱在平衡中。",
+            "source": ""
+          }
+        ],
+        "noteAvailable": true,
+        "year": "2024"
       }
     ],
-    "favorites": []
+    "favorites": [],
+    "years": [
+      {
+        "year": "2025",
+        "goal": 20,
+        "read": 7,
+        "total": 9
+      },
+      {
+        "year": "2024",
+        "goal": null,
+        "read": 1,
+        "total": 1
+      }
+    ]
   },
   "method": {
     "intro": "",

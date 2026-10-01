@@ -23,6 +23,8 @@ const STATUS_DEFS = [
 Page({
   data: {
     intro: "",
+    years: [],
+    activeYear: "",
     chips: [],
     filter: "all",
     books: [],
@@ -42,6 +44,7 @@ Page({
     this.setData({
       intro: data.library.intro || "",
       allBooks: allBooks,
+      years: buildYears(data.library.years || [], allBooks),
       chips: buildChips(allBooks),
       filter: filter,
       ready: true
@@ -60,15 +63,16 @@ Page({
   },
 
   /**
-   * 应用筛选：更新书籍列表与芯片计数。
+   * 应用筛选：状态与年份叠加过滤，更新书籍列表与芯片计数。
    * @param {string} filter 筛选值（all / 已读 / 在读 / 想读）
    */
   _apply(filter) {
     const all = this.data.allBooks || [];
-    const books = filter === "all"
-      ? all
-      : all.filter(function (b) { return b.status === filter; });
-    this.setData({ books: books, chips: buildChips(all), filter: filter });
+    const year = this.data.activeYear || "";
+    const books = all.filter(function (b) {
+      return (filter === "all" || b.status === filter) && (!year || b.year === year);
+    });
+    this.setData({ books: books, chips: buildChips(all, year), filter: filter });
   },
 
   /** 点击芯片：持久化 + 重新过滤 */
@@ -79,9 +83,19 @@ Page({
     this._apply(value);
   },
 
-  /** 空态「查看全部」：回到 all */
+  /** 点击年报卡：切换该年筛选，再次点击取消 */
+  onToggleYear(e) {
+    const year = e.currentTarget.dataset.year;
+    if (!year) return;
+    const next = this.data.activeYear === year ? "" : year;
+    this.setData({ activeYear: next });
+    this._apply(this.data.filter);
+  },
+
+  /** 空态「查看全部」：回到 all 并取消年份筛选 */
   onEmptyAction() {
     store.setFilter(MOD, "all");
+    this.setData({ activeYear: "" });
     this._apply("all");
   },
 
@@ -115,14 +129,44 @@ Page({
 /**
  * 构建状态筛选芯片（全部 + 3 状态，各含计数）。
  * @param {Array} books 全部书籍
+ * @param {string} [year] 年份筛选（空 = 不限），计数随年份过滤
  * @returns {Array<{id:string,name:string,count:number}>}
  */
-function buildChips(books) {
-  const arr = books || [];
+function buildChips(books, year) {
+  const arr = (books || []).filter(function (b) { return !year || b.year === year; });
   const head = { id: "all", name: "全部", count: arr.length };
   const rest = STATUS_DEFS.map(function (s) {
     const count = arr.filter(function (b) { return b.status === s.id; }).length;
     return { id: s.id, name: s.name, count: count };
   });
   return [head].concat(rest);
+}
+
+/**
+ * 构建年报渲染数据：进度百分比 + 总结文案 + 选中态。
+ * @param {Array} years 契约 library.years（已按 year 降序）
+ * @param {Array} books 全部书籍（年份筛选态用）
+ * @returns {Array<{year,goalText,read,total,percent,summary,done}>}
+ */
+function buildYears(years, books) {
+  return (years || []).map(function (y) {
+    const hasGoal = typeof y.goal === "number" && y.goal > 0;
+    const denom = hasGoal ? y.goal : (y.total || y.read || 1);
+    const percent = Math.max(0, Math.min(100, denom ? Math.round((y.read / denom) * 100) : 0));
+    let summary;
+    if (hasGoal) {
+      summary = y.read >= y.goal ? "已达成年度目标 🎉" : "距目标还差 " + (y.goal - y.read) + " 本";
+    } else {
+      summary = "已读 " + y.read + " 本";
+    }
+    return {
+      year: y.year,
+      goalText: hasGoal ? "目标 " + y.goal + " 本" : "未设目标",
+      read: y.read,
+      total: y.total,
+      percent: percent,
+      summary: summary,
+      done: hasGoal && y.read >= y.goal
+    };
+  });
 }

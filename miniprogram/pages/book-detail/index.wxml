@@ -36,6 +36,7 @@
           <text class="badge">{{ book.status }}</text>
           <text wx:if="{{ book.tag }}" class="badge">{{ book.tag }}</text>
           <text wx:if="{{ book.readTime }}" class="badge">{{ book.readTime }}</text>
+          <text wx:if="{{ book.year }}" class="badge">{{ book.year }} 年</text>
         </view>
         <view wx:if="{{ starStr }}" class="bd-stars">{{ starStr }}</view>
       </view>

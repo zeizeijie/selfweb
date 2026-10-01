@@ -9,6 +9,29 @@
       <view wx:if="{{ intro }}" class="lead head-intro">{{ intro }}</view>
     </view>
 
+    <view wx:if="{{ years.length }}" class="years">
+      <view
+        wx:for="{{ years }}"
+        wx:key="year"
+        class="year-card {{ activeYear === item.year ? 'active' : '' }}"
+        data-year="{{ item.year }}"
+        bindtap="onToggleYear"
+      >
+        <view class="yc-head">
+          <text class="yc-num">{{ item.year }}</text>
+          <text class="yc-summary {{ item.done ? 'done' : '' }}">{{ item.summary }}</text>
+        </view>
+        <view class="yc-stats">
+          <text>{{ item.goalText }}</text>
+          <text>已读 {{ item.read }} 本</text>
+          <text>收录 {{ item.total }} 本</text>
+        </view>
+        <view class="yc-bar">
+          <view class="yc-fill {{ item.done ? 'done' : '' }}" style="width: {{ item.percent }}%;"></view>
+        </view>
+      </view>
+    </view>
+
     <view class="chips-wrap">
       <chip-bar items="{{ chips }}" active="{{ filter }}" bind:pick="onChip" />
     </view>
@@ -16,7 +39,7 @@
     <empty-state
       wx:if="{{ books.length === 0 }}"
       type="empty"
-      text="这个状态下还没有书"
+      text="这个筛选下还没有书"
       action-label="查看全部"
       bind:action="onEmptyAction"
     />

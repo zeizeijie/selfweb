@@ -123,6 +123,17 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   letter-spacing: -0.01em; margin-bottom: 12px;
 }
 
+/* 数字游民天数徽标：小圆角胶囊、细边框、次级文字色 */
+.nomad-day {
+  display: inline-block;
+  margin: 4px 0 18px;
+  padding: 6px 16px;
+  font-size: 13px; color: var(--text-secondary);
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  letter-spacing: -0.01em;
+}
+
 h1.hero-title {
   font-size: clamp(44px, 7vw, 88px);
   font-weight: 700; letter-spacing: -0.03em; line-height: 1.04;
@@ -780,3 +791,74 @@ h3.card-title {
 /* 隐藏滚动条工具类 */
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* ===========================================================
+   年报区块（图书馆阅读目标与总结）· lib-engineer 新增
+   =========================================================== */
+
+/* 年报卡横向流：多卡时自动换行，单卡不撑满 */
+.lib-years {
+  display: flex; flex-wrap: wrap; gap: 18px;
+  margin-bottom: 34px;
+}
+
+/* 年份卡：白底细边框、圆角 18px、克制阴影、hover 微上浮 */
+.lib-year-card {
+  flex: 1 1 280px; max-width: 420px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-m);
+  padding: 24px 26px 22px;
+  cursor: pointer;
+  box-shadow: var(--shadow-s);
+  transition: transform .35s var(--ease), box-shadow .35s var(--ease), border-color .35s var(--ease);
+}
+.lib-year-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-m);
+  border-color: var(--line-strong);
+}
+.lib-year-card.active {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, .14), var(--shadow-s);
+}
+
+/* 头部：年份大数字 + 总结文案 */
+.lib-year-card .ly-head {
+  display: flex; align-items: baseline; gap: 14px; margin-bottom: 12px;
+}
+.lib-year-card .ly-num {
+  font-size: 34px; font-weight: 700; letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+.lib-year-card .ly-summary {
+  font-size: 13.5px; color: var(--text-secondary); letter-spacing: -0.01em;
+}
+
+/* 统计行：目标 / 已读 / 收录 */
+.lib-year-card .ly-stats {
+  display: flex; gap: 18px; flex-wrap: wrap;
+  font-size: 13.5px; color: var(--text-tertiary);
+  margin-bottom: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 进度条：主色填充 */
+.lib-year-card .ly-bar {
+  height: 6px; border-radius: 999px; background: var(--bg-alt); overflow: hidden;
+}
+.lib-year-card .ly-bar i {
+  display: block; height: 100%; border-radius: 999px;
+  background: var(--blue);
+  transition: width .8s var(--ease);
+}
+
+/* 年份筛选 chip（libChips 内追加项）沿用 .chip 基础样式，仅补充命名 */
+.chip.year-chip { font-variant-numeric: tabular-nums; }
+
+@media (max-width: 734px) {
+  .lib-years { gap: 14px; margin-bottom: 26px; }
+  .lib-year-card { flex: 1 1 100%; max-width: none; padding: 20px 22px 18px; }
+  .lib-year-card .ly-num { font-size: 28px; }
+  .lib-year-card .ly-summary { font-size: 12.5px; }
+}

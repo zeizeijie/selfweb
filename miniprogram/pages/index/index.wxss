@@ -19,6 +19,18 @@
   color: var(--text-tertiary);
 }
 
+/* 数字游民天数徽标：小圆角胶囊、细边框、次级文字色（与站点同款） */
+.nomad-day {
+  display: inline-block;
+  margin-top: 8rpx;
+  padding: 12rpx 32rpx;
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  border: 2rpx solid var(--line-strong);
+  border-radius: var(--radius-pill);
+  line-height: 1.4;
+}
+
 /* ---------- 统计 ---------- */
 .stats {
   margin-top: 48rpx;

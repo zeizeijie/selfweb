@@ -154,6 +154,56 @@ function mergeByModule(notionData, failedMods, localData) {
 }
 
 /**
+ * 本地笔记回填：Notion 书页的读书笔记以「链接数据库视图」存在时，
+ * 集成无权访问其源库，导致同步结果 noteAvailable 全为 false。
+ * 这里对 note 为空的书按书名与本地数据精确匹配（title 全等），
+ * 命中则回填 note / noteTitle / noteAvailable（只补笔记，书总数不变，
+ * modules[].count 无需调整）；书名差异（如带副标题）匹配不到则跳过并 log。
+ * @param {object} data Notion 拉取（或模块合并后）的契约数据，原地修改
+ * @param {object} localData 本地契约数据 data/site-data.local.json
+ * @returns {number} 回填成功的本数
+ */
+function backfillLocalNotes(data, localData) {
+  if (!data || !localData) return 0;
+  const books = (data.library || {}).books;
+  const localBooks = (localData.library || {}).books || [];
+  if (!Array.isArray(books) || !localBooks.length) return 0;
+
+  // 本地有笔记的书：title → 书（全等匹配用）
+  const byTitle = {};
+  localBooks.forEach(function (b) {
+    if (b && b.title && b.noteAvailable && Array.isArray(b.note) && b.note.length) {
+      byTitle[String(b.title)] = b;
+    }
+  });
+
+  const matched = {};
+  let filled = 0;
+  books.forEach(function (b) {
+    if (!b) return;
+    if (b.noteAvailable && Array.isArray(b.note) && b.note.length) {
+      matched[String(b.title)] = true; // 已有笔记（Notion 块 / 本地替换），视为已覆盖
+      return;
+    }
+    const hit = byTitle[String(b.title)];
+    if (!hit) return; // 本地无此书笔记（或书名差异），跳过
+    b.note = JSON.parse(JSON.stringify(hit.note));
+    b.noteTitle = hit.noteTitle || "读书笔记";
+    b.noteAvailable = true;
+    matched[String(b.title)] = true;
+    filled++;
+    log("[backfill] 已回填读书笔记：" + b.title);
+  });
+
+  // 暴露书名差异：本地有笔记但 Notion 侧未匹配到同名书
+  const unmatched = Object.keys(byTitle).filter(function (t) { return !matched[t]; });
+  if (unmatched.length) {
+    warn("[backfill] 本地有读书笔记但未匹配到同名书（书名可能有差异）：" + unmatched.join("、"));
+  }
+  return filled;
+}
+
+/**
  * 按三级降级链获取原始源。
  * @param {object} args 参数
  * @returns {Promise<{source:object, level:number, label:string, counts:object}>}
@@ -175,12 +225,21 @@ async function loadSource(args) {
         try { local = readLocalSource(); } catch (e) { /* 本地缺失则不补齐 */ }
         if (local) {
           const r = mergeByModule(res.data, failed, local);
+          // 笔记回填：Notion 取不到链接数据库视图的读书笔记，用本地数据补齐
+          backfillLocalNotes(r.merged, local);
           warn("[source] ① 模块级降级：[" + failed.join(", ") + "] 同步失败，已回填本地数据" +
             (r.patched.length ? "（成功回填：" + r.patched.join(", ") + "）" : "（本地亦无数据）"));
           log("[source] ① Notion 部分同步成功（" + Object.keys(res.counts).map(function (k) { return k + "=" + (failed.indexOf(k) >= 0 ? "本地" : res.counts[k]); }).join(" / ") + "）");
           return { source: r.merged, level: 1, label: "Notion API + 本地回填", counts: countOf(r.merged), failed: failed };
         }
       }
+
+      // 笔记回填：书页读书笔记以「链接数据库视图」存在时 API 取不到，用本地数据补齐
+      try {
+        const local = readLocalSource();
+        const filled = backfillLocalNotes(res.data, local);
+        if (filled > 0) log("[source] ① 已用本地数据回填读书笔记 " + filled + " 本");
+      } catch (e) { /* 本地缺失则不回填 */ }
 
       log("[source] ① Notion 同步成功（" + Object.keys(res.counts).map(function (k) { return k + "=" + res.counts[k]; }).join(" / ") + "）");
       return { source: res.data, level: 1, label: "Notion API", counts: res.counts, failed: failed };
@@ -364,6 +423,8 @@ if (require.main === module) {
 module.exports = {
   run: run,
   loadSource: loadSource,
+  mergeByModule: mergeByModule,
+  backfillLocalNotes: backfillLocalNotes,
   copySiteToDist: copySiteToDist,
   resolveSiteUrl: resolveSiteUrl,
   parseArgs: parseArgs
